@@ -49,7 +49,7 @@ Il s’agit d’un projet de réseau social «instagram style» permettant aux c
 ### Lister les technos utilisées
 
 Interface : React Native Expo -(https://facebook.github.io/react-native/ (https://expo.io/)
-v  API ^
+v  API  ^
 Back : Symfo 
 
 
