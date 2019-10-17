@@ -7,9 +7,10 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\ConditionRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\WearConditionRepository")
+ * @ORM\HasLifecycleCallbacks()
  */
-class Condition
+class WearCondition
 {
     /**
      * @ORM\Id()
@@ -41,6 +42,8 @@ class Condition
     public function __construct()
     {
         $this->posts = new ArrayCollection();
+        $this->createdAt = new \DateTime();
+        $this->updatedAt = null;
     }
 
     public function getId(): ?int
@@ -113,5 +116,13 @@ class Condition
         }
 
         return $this;
+    }
+
+    /**
+     * @ORM\PreUpdate
+     */
+    public function setUpdatedAtValue()
+    {
+        $this->updatedAt = new \DateTime();
     }
 }

@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\PostRepository")
+ * @ORM\HasLifecycleCallbacks()
  */
 class Post
 {
@@ -17,7 +18,7 @@ class Post
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=32)
+     * @ORM\Column(type="string", length=64)
      */
     private $title;
 
@@ -80,7 +81,7 @@ class Post
     private $visibility;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Condition", inversedBy="posts")
+     * @ORM\ManyToOne(targetEntity="App\Entity\WearCondition", inversedBy="posts")
      * @ORM\JoinColumn(nullable=false)
      */
     private $wearCondition;
@@ -90,6 +91,12 @@ class Post
      * @ORM\JoinColumn(nullable=false)
      */
     private $category;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTime();
+        $this->updatedAt = null;
+    }
 
     public function getId(): ?int
     {
@@ -245,7 +252,7 @@ class Post
         return $this->wearCondition;
     }
 
-    public function setWearCondition(?Condition $wearCondition): self
+    public function setWearCondition(?WearCondition $wearCondition): self
     {
         $this->wearCondition = $wearCondition;
 
@@ -263,4 +270,13 @@ class Post
 
         return $this;
     }
+
+    /**
+     * @ORM\PreUpdate
+     */
+    public function setUpdatedAtValue()
+    {
+        $this->updatedAt = new \DateTime();
+    }
+
 }

@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\PostStatusRepository")
+ * @ORM\HasLifecycleCallbacks()
  */
 class PostStatus
 {
@@ -41,6 +42,8 @@ class PostStatus
     public function __construct()
     {
         $this->posts = new ArrayCollection();
+        $this->createdAt = new \DateTime();
+        $this->updatedAt = null;
     }
 
     public function getId(): ?int
@@ -113,5 +116,13 @@ class PostStatus
         }
 
         return $this;
+    }
+
+    /**
+     * @ORM\PreUpdate
+     */
+    public function setUpdatedAtValue()
+    {
+        $this->updatedAt = new \DateTime();
     }
 }

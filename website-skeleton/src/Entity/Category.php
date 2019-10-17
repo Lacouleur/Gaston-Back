@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\CategoryRepository")
+ * @ORM\HasLifecycleCallbacks()
  */
 class Category
 {
@@ -41,6 +42,8 @@ class Category
     public function __construct()
     {
         $this->posts = new ArrayCollection();
+        $this->createdAt = new \DateTime();
+        $this->updatedAt = null;
     }
 
     public function getId(): ?int
@@ -113,6 +116,14 @@ class Category
         }
 
         return $this;
+    }
+
+    /**
+     * @ORM\PreUpdate
+     */
+    public function setUpdatedAtValue()
+    {
+        $this->updatedAt = new \DateTime();
     }
 }
 
