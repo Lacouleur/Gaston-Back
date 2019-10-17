@@ -1,6 +1,6 @@
 # Dictionnaire de données
 
-<!-- il y a des points d'interrogation pour les incertitudes -->
+
 ## Profil utilisateur (`user`)
 
 |Champ|Type|Spécificités|Description|
