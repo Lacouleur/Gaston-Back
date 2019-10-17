@@ -34,7 +34,7 @@
 |address_label|VARCHAR(128)|NOT NULL|L'adresse de l'objet|
 |lat|FLOAT|NOT NULL|Latitude en degrés décimaux de l'adresse|
 |lng|FLOAT|NOT NULL|Longitude en degrés décimaux de l'adresse|
-|nb_likes|INT|NULL|Nombre de likes de la publication|
+|nb_likes|INT|NOT NULL|Nombre de likes de la publication|
 |created_at|TIMESTAMP|NOT NULL, DEFAULT CURRENT_TIMESTAMP|La date de création de la publication|
 |updated_at|TIMESTAMP|NULL|La date de la dernière mise à jour de la publication|
 
