@@ -61,6 +61,36 @@ class Post
      */
     private $updatedAt;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="posts")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $user;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\PostStatus", inversedBy="posts")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $postStatus;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Visibility", inversedBy="posts")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $visibility;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Condition", inversedBy="posts")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $wearCondition;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Category", inversedBy="posts")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $category;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -170,6 +200,66 @@ class Post
     public function setUpdatedAt(?\DateTimeInterface $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function getPostStatus(): ?PostStatus
+    {
+        return $this->postStatus;
+    }
+
+    public function setPostStatus(?PostStatus $postStatus): self
+    {
+        $this->postStatus = $postStatus;
+
+        return $this;
+    }
+
+    public function getVisibility(): ?Visibility
+    {
+        return $this->visibility;
+    }
+
+    public function setVisibility(?Visibility $visibility): self
+    {
+        $this->visibility = $visibility;
+
+        return $this;
+    }
+
+    public function getWearCondition(): ?Condition
+    {
+        return $this->wearCondition;
+    }
+
+    public function setWearCondition(?Condition $wearCondition): self
+    {
+        $this->wearCondition = $wearCondition;
+
+        return $this;
+    }
+
+    public function getCategory(): ?Category
+    {
+        return $this->category;
+    }
+
+    public function setCategory(?Category $category): self
+    {
+        $this->category = $category;
 
         return $this;
     }
