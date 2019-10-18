@@ -5,15 +5,24 @@ use App\Entity\User;
 use Faker;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Persistence\ObjectManager;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class FakerFixtures extends Fixture
 {
+    /**
+     * On demande à Symfony de nous transmettre le "service" UserPasswordEncoder
+     * à l'instanciation de l'objet
+     */
+    public function __construct(UserPasswordEncoderInterface $passwordEncoder)
+    {
+        $this->passwordEncoder = $passwordEncoder;
+    }
+
     public function load(ObjectManager $manager)
     {
-        // 1. Configuration de Faker
-        // On crée une instance de Faker en français
+        // 1. Configuration
         $generator = Faker\Factory::create('fr_FR');
-        // On passe le Manager de Doctrine à Faker
+        
         $populator = new Faker\ORM\Doctrine\Populator($generator, $manager);
 
         // 2. Fixtures
@@ -22,12 +31,13 @@ class FakerFixtures extends Fixture
         $admin = new User();
         $admin->setUsername('admin');
         $admin->setEmail('admin@admin.com');
-        $admin->setPassword('admin');
+        $encodedPassword = $this->passwordEncoder->encodePassword($admin, 'admin');
+        $admin->setPassword($encodedPassword);
         $admin->setRoles(['ROLE_ADMIN']);
-        $admin->setAddressLabel('Chez l\'admin');
-        $admin->setLat(rand(-90, 90));
-        $admin->setLng(rand(-180, 180));
-        // On persiste notre user
+        $admin->setAddressLabel($generator->address);
+        $admin->setLat($generator->latitude);
+        $admin->setLng($generator->longitude);
+        
         $manager->persist($admin);
 
         // Users
