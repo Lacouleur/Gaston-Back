@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}WearCondition{% endblock %}
+
+{% block body %}
+    <h1>WearCondition</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ wear_condition.id }}</td>
+            </tr>
+            <tr>
+                <th>Label</th>
+                <td>{{ wear_condition.label }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ wear_condition.createdAt ? wear_condition.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>UpdatedAt</th>
+                <td>{{ wear_condition.updatedAt ? wear_condition.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('wear_condition_index') }}">back to list</a>
+
+    <a href="{{ path('wear_condition_edit', {'id': wear_condition.id}) }}">edit</a>
+
+    {{ include('wear_condition/_delete_form.html.twig') }}
+{% endblock %}

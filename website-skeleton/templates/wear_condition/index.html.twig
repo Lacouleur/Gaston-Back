@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}WearCondition index{% endblock %}
+
+{% block body %}
+    <h1>WearCondition index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Label</th>
+                <th>CreatedAt</th>
+                <th>UpdatedAt</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for wear_condition in wear_conditions %}
+            <tr>
+                <td>{{ wear_condition.id }}</td>
+                <td>{{ wear_condition.label }}</td>
+                <td>{{ wear_condition.createdAt ? wear_condition.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ wear_condition.updatedAt ? wear_condition.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('wear_condition_show', {'id': wear_condition.id}) }}">show</a>
+                    <a href="{{ path('wear_condition_edit', {'id': wear_condition.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('wear_condition_new') }}">Create new</a>
+{% endblock %}
