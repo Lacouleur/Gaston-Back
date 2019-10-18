@@ -28,7 +28,7 @@
 |Champ|Type|Spécificités|Description|
 |-|-|-|-|
 |id|INT|PRIMARY KEY, NOT NULL, UNSIGNED, AUTO_INCREMENT|L'identifiant de la publication|
-|title|VARCHAR(32)|NOT NULL|Titre de la publication|
+|title|VARCHAR(64)|NOT NULL|Titre de la publication|
 |description|TEXT|NOT NULL|Texte descriptif de la publication|
 |picture|VARCHAR(128)|NULL|Nom de l'image|
 |address_label|VARCHAR(128)|NOT NULL|L'adresse de l'objet|

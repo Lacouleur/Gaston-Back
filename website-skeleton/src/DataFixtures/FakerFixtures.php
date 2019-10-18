@@ -25,7 +25,7 @@ class FakerFixtures extends Fixture
         $admin->setPassword('admin');
         $admin->setRoles(['ROLE_ADMIN']);
         $admin->setAddressLabel('Chez l\'admin');
-        $admin->setLat(rand(0, 90));
+        $admin->setLat(rand(-90, 90));
         $admin->setLng(rand(-180, 180));
         // On persiste notre user
         $manager->persist($admin);
@@ -44,14 +44,14 @@ class FakerFixtures extends Fixture
             'roles' => function () {
                 return ['ROLE_USER'];
             },
-            'addressLabel' => function () {
-                return 'Chez le user';
+            'addressLabel' => function () use ($generator) {
+                return $generator->address;
             },
-            'lat' => function () {
-                return rand(-90, 90);
+            'lat' => function () use ($generator) {
+                return $generator->latitude;
             },
-            'lng' => function () {
-                return rand(-180, 180);
+            'lng' => function () use ($generator) {
+                return $generator->longitude;
             },
         ));
 
@@ -91,14 +91,14 @@ class FakerFixtures extends Fixture
             'description' => function () use ($generator) {
                 return $generator->text();
             },
-            'addressLabel' => function () {
-                return 'Chez l\'objet';
+            'addressLabel' => function () use ($generator) {
+                return $generator->address;
             },
-            'lat' => function () {
-                return rand(0, 90);
+            'lat' => function () use ($generator) {
+                return $generator->latitude;
             },
-            'lng' => function () {
-                return rand(-180, 180);
+            'lng' => function () use ($generator) {
+                return $generator->longitude;
             },
             'nbLikes' => function () {
                 return rand(0, 10);
