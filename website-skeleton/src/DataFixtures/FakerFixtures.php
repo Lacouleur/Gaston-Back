@@ -63,6 +63,9 @@ class FakerFixtures extends Fixture
             'lng' => function () use ($generator) {
                 return $generator->longitude;
             },
+            'status' => function () {
+                return true;
+            },
         ));
 
         // Post-Status
