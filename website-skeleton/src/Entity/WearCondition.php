@@ -5,6 +5,8 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraint as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\WearConditionRepository")
@@ -16,11 +18,14 @@ class WearCondition
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups("post_get")
+     * @Groups("wearCondition_get")
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=32)
+     * @Groups("wearCondition_get")
      */
     private $label;
 
@@ -36,6 +41,7 @@ class WearCondition
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Post", mappedBy="wearCondition", orphanRemoval=true)
+     * @Groups("wearCondition_get")
      */
     private $posts;
 

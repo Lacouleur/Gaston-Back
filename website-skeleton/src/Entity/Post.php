@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraint as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\PostRepository")
@@ -14,81 +16,101 @@ class Post
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups("user_get")
+     * @Groups("post_get")
+     * @Groups("category_get")
+     * @Groups("wearCondition_get")
+     * @Groups("postStatus_get")
+     * @Groups("visibility_get")
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=128)
+     * @Groups("post_get")
      */
     private $title;
 
     /**
      * @ORM\Column(type="text")
+     * @Groups("post_get")
      */
     private $description;
 
     /**
      * @ORM\Column(type="string", length=128, nullable=true)
+     * @Groups("post_get")
      */
     private $picture;
 
     /**
      * @ORM\Column(type="string", length=128)
+     * @Groups("post_get")
      */
     private $addressLabel;
 
     /**
      * @ORM\Column(type="float")
+     * @Groups("post_get")
      */
     private $lat;
 
     /**
      * @ORM\Column(type="float")
+     * @Groups("post_get")
      */
     private $lng;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
+     * @Groups("post_get")
      */
     private $nbLikes;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups("post_get")
      */
     private $createdAt;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
+     * @Groups("post_get")
      */
     private $updatedAt;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="posts")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups("post_get")
      */
     private $user;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\PostStatus", inversedBy="posts")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups("post_get")
      */
     private $postStatus;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Visibility", inversedBy="posts")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups("post_get")
      */
     private $visibility;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\WearCondition", inversedBy="posts")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups("post_get")
      */
     private $wearCondition;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Category", inversedBy="posts")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups("post_get")
      */
     private $category;
 
@@ -247,7 +269,7 @@ class Post
         return $this;
     }
 
-    public function getWearCondition(): ?Condition
+    public function getWearCondition(): ?WearCondition
     {
         return $this->wearCondition;
     }
@@ -277,6 +299,10 @@ class Post
     public function setUpdatedAtValue()
     {
         $this->updatedAt = new \DateTime();
+    }
+    public function __toString()
+    {
+        return $this->title;
     }
 
 }

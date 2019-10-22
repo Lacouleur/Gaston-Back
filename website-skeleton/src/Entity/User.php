@@ -5,8 +5,11 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraint as Assert;
+
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
@@ -20,92 +23,111 @@ class User implements UserInterface
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups("user_get")
+     * @Groups("post_get")
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=64)
+     * @Groups("user_get")
      */
     private $username;
 
     /**
      * @ORM\Column(type="string", length=64)
+     * @Groups("user_get")
      */
     private $email;
 
     /**
      * @var string The hashed password
      * @ORM\Column(type="string")
+     * @Groups("user_get")
      */
     private $password;
 
     /**
      * @ORM\Column(type="string", length=128)
+     * @Groups("user_get")
      */
     private $addressLabel;
 
     /**
      * @ORM\Column(type="float")
+     * @Groups("user_get")
      */
     private $lat;
 
     /**
      * @ORM\Column(type="float")
+     * @Groups("user_get")
      */
     private $lng;
 
     /**
      * @ORM\Column(type="string", length=64, nullable=true)
+     * @Groups("user_get")
      */
     private $firstname;
 
     /**
      * @ORM\Column(type="string", length=64, nullable=true)
+     * @Groups("user_get")
      */
     private $lastname;
 
     /**
      * @ORM\Column(type="text", nullable=true)
+     * @Groups("user_get")
      */
     private $description;
 
     /**
      * @ORM\Column(type="string", length=128, nullable=true)
+     * @Groups("user_get")
      */
     private $picture;
 
     /**
      * @ORM\Column(type="string", length=32, nullable=true)
+     * @Groups("user_get")
      */
     private $phoneNumber;
 
     /**
      * @ORM\Column(type="string", length=64, nullable=true)
+     * @Groups("user_get")
      */
     private $organisation;
 
     /**
      * @ORM\Column(type="boolean")
+     * @Groups("user_get")
      */
     private $status;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups("user_get")
      */
     private $createdAt;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
+     * @Groups("user_get")
      */
     private $updatedAt;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Post", mappedBy="user", orphanRemoval=true)
+     * @Groups("user_get")
      */
     private $posts;
 
     /**
      * @ORM\Column(type="json")
+     * @Groups("user_get")
      */
     private $roles = [];
 
