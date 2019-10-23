@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraint as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\PostRepository")
@@ -298,6 +299,10 @@ class Post
     public function setUpdatedAtValue()
     {
         $this->updatedAt = new \DateTime();
+    }
+    public function __toString()
+    {
+        return $this->title;
     }
 
 }
