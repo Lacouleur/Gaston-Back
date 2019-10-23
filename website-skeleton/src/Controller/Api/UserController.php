@@ -5,6 +5,7 @@ namespace App\Controller\Api;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
@@ -46,7 +47,7 @@ class UserController extends AbstractController
             'groups' => 'user_get',
         ]);
 
-        //dd($jsonData);
+    //dd($jsonData);
 
         return new Response($jsonData);
     }
@@ -54,21 +55,11 @@ class UserController extends AbstractController
     /**
      * @Route("/user-new", name="create_user", methods={"GET","POST"})
      */
-    public function apiCreateUser($jsonData, UserPasswordEncoderInterface $passwordEncoder, SerializerInterface $serializer)
+    public function apiCreateUser(Request $request, UserPasswordEncoderInterface $passwordEncoder, SerializerInterface $serializer)
     {
-        //$jsonData = '{
-        //    "username": "test",
-        //    "email": "test@test.com",
-        //    "password": "test",
-        //    "addressLabel": "31, rue du test 35000 Rennes",
-        //    "lat": -20.100092,
-        //    "lng": -77.157947
-        //  }';
-
-        //dd($jsonData);
+        $jsonData = $request->getContent();
 
         $user = $serializer->deserialize($jsonData, User::class, 'json');
-        //dd($user);
 
         $this->passwordEncoder = $passwordEncoder;
         $encodedPassword = $this->passwordEncoder->encodePassword($user, ':password');
@@ -81,7 +72,6 @@ class UserController extends AbstractController
         $entityManager->flush();
 
         return new Response('L\'utilisateur à été créé');
-
     }
 
 }
