@@ -52,7 +52,7 @@ class PostController extends AbstractController
     }
 
     /**
-     * @Route("/posts-close", name="close_posts", methods={"GET","POST"})
+     * @Route("/close/post", name="close_post", methods={"GET","POST"})
      */
     public function apiClosePosts(Request $request, PostRepository $postRepository, SerializerInterface $serializer)
     {
