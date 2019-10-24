@@ -18,7 +18,33 @@ class PostRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Post::class);
     }
+    
+    /**
+      * @return Post[] Returns an array of Post objects
+      */
+    public function findAllClosePosts($lat, $lng): array
+    {
+        $entityManager = $this->getEntityManager();
 
+        $query = $entityManager->createQuery(
+            'SELECT
+                id, (
+                    6371 * acos (
+                        cos ( radians(78.3232) )
+                        * cos( radians(' . $lat . ') )
+                        * cos( radians(' . $lng . ') - radians(65.3234) )
+                        + sin ( radians(78.3232) )
+                        * sin( radians(' . $lat . ') )
+                    )
+                ) AS distance
+            FROM post
+            HAVING distance < 30
+            ORDER BY distance'
+        );
+
+        return $query->getResult();
+    }
+    
     // /**
     //  * @return Post[] Returns an array of Post objects
     //  */
