@@ -24,9 +24,9 @@ class PostRepository extends ServiceEntityRepository
       */
     public function findAllClosePosts($lat, $lng): array
     {
-        $entityManager = $this->getEntityManager();
+        $conn = $this->getEntityManager()->getConnection();
 
-        $query = $entityManager->createQuery(
+        $sql = 
             'SELECT
                 id, (
                     6371 * acos (
@@ -38,11 +38,13 @@ class PostRepository extends ServiceEntityRepository
                     )
                 ) AS distance
             FROM post
-            HAVING distance < 30
+            HAVING distance < 100
             ORDER BY distance'
-        );
+        ;
+        $stmt = $conn->prepare($sql);
+        $stmt->execute(['lat' => $lat, 'lng' => $lng]);
 
-        return $query->getResult();
+        return $stmt->fetchAll();
     }
     
     // /**
