@@ -5,6 +5,7 @@ namespace App\Controller\Api;
 use App\Entity\Post;
 use App\Repository\PostRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -46,6 +47,26 @@ class PostController extends AbstractController
         ]);
 
         //dd($jsonData);
+
+        return new Response($jsonData);
+    }
+
+    /**
+     * @Route("/close/post", name="close_post", methods={"GET","POST"})
+     */
+    public function apiClosePosts(Request $request, PostRepository $postRepository, SerializerInterface $serializer)
+    {
+        $jsonData = $request->getContent();
+
+        $post = $serializer->deserialize($jsonData, Post::class, 'json');
+        $lat = $post->getLat();
+        $lng = $post->getLng();
+        //dd($lat, $lng);
+        $closePosts = $postRepository->findAllClosePosts($lat, $lng);
+
+        $jsonData = $serializer->serialize($closePosts, 'json', [
+            'groups' => 'post_get',
+        ]);
 
         return new Response($jsonData);
     }

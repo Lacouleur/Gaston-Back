@@ -3,6 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Entity\User;
+use App\Repository\PostRepository;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -72,6 +73,26 @@ class UserController extends AbstractController
         $entityManager->flush();
 
         return new Response('L\'utilisateur à été créé');
+    }
+
+    /**
+     * @Route("/close/user", name="close_user", methods={"GET","POST"})
+     */
+    public function apiClosePosts(Request $request, PostRepository $postRepository, SerializerInterface $serializer)
+    {
+        $jsonData = $request->getContent();
+
+        $user = $serializer->deserialize($jsonData, User::class, 'json');
+        $lat = $user->getLat();
+        $lng = $user->getLng();
+        //dd($lat, $lng);
+        $closePosts = $postRepository->findAllClosePosts($lat, $lng);
+
+        $jsonData = $serializer->serialize($closePosts, 'json', [
+            'groups' => 'post_get',
+        ]);
+
+        return new Response($jsonData);
     }
 
 }
