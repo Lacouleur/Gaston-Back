@@ -97,7 +97,7 @@ class FakerFixtures extends Fixture
         ));    
         
         // Posts
-        $populator->addEntity('App\Entity\Post', 20, array(
+        $populator->addEntity('App\Entity\Post', 500, array(
             'title' => function () use ($generator) {
                 return $generator->sentence();
             },

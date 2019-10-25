@@ -131,6 +131,11 @@ class User implements UserInterface
      */
     private $roles = [];
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Commentary", mappedBy="user")
+     */
+    private $commentaries;
+
     public function __construct()
     {
         $this->posts = new ArrayCollection();
@@ -138,6 +143,7 @@ class User implements UserInterface
         $this->updatedAt = null;
         $this->status = true;
         $this->roles = ['ROLE_USER'];
+        $this->commentaries = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -406,5 +412,36 @@ class User implements UserInterface
     public function setUpdatedAtValue()
     {
         $this->updatedAt = new \DateTime();
+    }
+
+    /**
+     * @return Collection|Commentary[]
+     */
+    public function getCommentaries(): Collection
+    {
+        return $this->commentaries;
+    }
+
+    public function addCommentary(Commentary $commentary): self
+    {
+        if (!$this->commentaries->contains($commentary)) {
+            $this->commentaries[] = $commentary;
+            $commentary->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCommentary(Commentary $commentary): self
+    {
+        if ($this->commentaries->contains($commentary)) {
+            $this->commentaries->removeElement($commentary);
+            // set the owning side to null (unless already changed)
+            if ($commentary->getUser() === $this) {
+                $commentary->setUser(null);
+            }
+        }
+
+        return $this;
     }
 }

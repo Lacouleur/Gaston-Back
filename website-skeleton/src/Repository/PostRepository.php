@@ -30,15 +30,15 @@ class PostRepository extends ServiceEntityRepository
             'SELECT
                 id, (
                     6371 * acos (
-                        cos ( radians(78.3232) )
-                        * cos( radians(' . $lat . ') )
-                        * cos( radians(' . $lng . ') - radians(65.3234) )
-                        + sin ( radians(78.3232) )
-                        * sin( radians(' . $lat . ') )
+                        cos ( radians(' . $lat . ') )
+                        * cos( radians( lat ) )
+                        * cos( radians( lng ) - radians(' . $lng . ') )
+                        + sin ( radians(' . $lat . ') )
+                        * sin( radians( lat ) )
                     )
                 ) AS distance
             FROM post
-            HAVING distance < 100
+            HAVING distance < 1000
             ORDER BY distance'
         ;
         $stmt = $conn->prepare($sql);
