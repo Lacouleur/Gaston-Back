@@ -3,7 +3,12 @@
 namespace App\Controller\Api;
 
 use App\Entity\Post;
+use App\Repository\CategoryRepository;
 use App\Repository\PostRepository;
+use App\Repository\PostStatusRepository;
+use App\Repository\UserRepository;
+use App\Repository\VisibilityRepository;
+use App\Repository\WearConditionRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -52,12 +57,34 @@ class PostController extends AbstractController
     /**
      * @Route("/post-new", name="create_post", methods={"GET","POST"})
      */
-    public function apiCreatePost(Request $request, SerializerInterface $serializer)
+    public function apiCreatePost(Request $request, SerializerInterface $serializer, UserRepository $userRepository, 
+    PostStatusRepository $postStatusRepository, VisibilityRepository $visibilityRepository, 
+    WearConditionRepository $wearConditionRepository, CategoryRepository $categoryRepository)
     {
         $jsonData = $request->getContent();
         //dd($jsonData);
         $post = $serializer->deserialize($jsonData, Post::class, 'json');
-        dd($post);
+        //dd($post);
+        $parsed_json = json_decode($jsonData);
+
+        $userId = $parsed_json->{'user'}->{'id'};
+        $postStatusId = $parsed_json->{'postStatus'}->{'id'};
+        $visibilityId = $parsed_json->{'visibility'}->{'id'};
+        $wearConditionId = $parsed_json->{'wearCondition'}->{'id'};
+        $categoryId = $parsed_json->{'category'}->{'id'};
+
+        $user = $userRepository->find($userId);
+        $post->setUser($user);
+        $postStatus = $postStatusRepository->find($postStatusId);
+        $post->setPostStatus($postStatus);
+        $visibility = $visibilityRepository->find($visibilityId);
+        $post->setVisibility($visibility);
+        $wearCondition = $wearConditionRepository->find($wearConditionId);
+        $post->setWearCondition($wearCondition);
+        $category = $categoryRepository->find($categoryId);
+        $post->setCategory($category);
+        //dd($post);
+
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($post);
         $entityManager->flush();
@@ -89,7 +116,7 @@ class PostController extends AbstractController
 
                 $entityManager = $this->getDoctrine()->getManager();
                 $entityManager->persist($post[0]);
-                $entityManager->flush();
+                $entityManager->flush(); 
 
             } catch (FileException $e) {
                 // ... handle exception if something happens during file upload
