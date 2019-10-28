@@ -56,7 +56,7 @@ class PostController extends AbstractController
     }
 
     /**
-     * @Route("/{id}/edit", name="edit_post", methods={"GET","POST"})
+     * @Route("/{id}/edit", name="edit_post", methods={"GET","PUT"})
      */
     public function edit(Request $request, Post $post, SerializerInterface $serializer, UserRepository $userRepository, 
     PostStatusRepository $postStatusRepository, VisibilityRepository $visibilityRepository, 
@@ -94,7 +94,7 @@ class PostController extends AbstractController
         $post->setLng($postLng);
 
         $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->persist($post);
+        $entityManager->merge($post);
         $entityManager->flush();
 
         return new Response('Le post à été modifié');  
@@ -185,15 +185,12 @@ class PostController extends AbstractController
     }
 
     /**
-     * @Route("/post-picture", name="picture_post", methods={"GET","POST"})
+     * @Route("/post/{id}/new-picture", name="new_picture_post", methods={"GET","POST"})
      */
-    public function apiPicturePost(Request $request, PostRepository $postRepository)
+    public function apiPicturePost(Request $request, Post $post)
     {
         /** @var UploadedFile $picture */
         $picture = $request->files->get('image');
-        $postId = $request->request->get('postId');
-
-        $post = $postRepository->findById($postId);
         
         if ($picture) {
             $filename = pathinfo($picture->getClientOriginalName(), PATHINFO_FILENAME);
@@ -204,18 +201,20 @@ class PostController extends AbstractController
                     $filename
                 );
                 
-                $post[0]->setPicture($filename);
+                $post->setPicture($filename);
 
                 $entityManager = $this->getDoctrine()->getManager();
-                $entityManager->persist($post[0]);
+                $entityManager->merge($post);
                 $entityManager->flush(); 
+
+                return new Response('L\'image est stockée');
 
             } catch (FileException $e) {
                 // ... handle exception if something happens during file uploadf8f3577217a7fb6b58745689a06a1405
             }
         }
 
-        return new Response('L\'image est stockée!');
+        return new Response('Pas d\'image');
     }
 
     /**
