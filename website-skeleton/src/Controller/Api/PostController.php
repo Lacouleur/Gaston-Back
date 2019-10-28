@@ -56,9 +56,47 @@ class PostController extends AbstractController
     }
 
     /**
+     * @Route("/post-new", name="create_post", methods={"GET","POST"})
+     */
+    public function apiCreatePost(Request $request, SerializerInterface $serializer, UserRepository $userRepository, 
+    PostStatusRepository $postStatusRepository, VisibilityRepository $visibilityRepository, 
+    WearConditionRepository $wearConditionRepository, CategoryRepository $categoryRepository)
+    {
+        $jsonData = $request->getContent();
+
+        $post = $serializer->deserialize($jsonData, Post::class, 'json');
+
+        $parsed_json = json_decode($jsonData);
+
+        $userId = $parsed_json->{'user'}->{'id'};
+        $postStatusId = $parsed_json->{'postStatus'}->{'id'};
+        $visibilityId = $parsed_json->{'visibility'}->{'id'};
+        $wearConditionId = $parsed_json->{'wearCondition'}->{'id'};
+        $categoryId = $parsed_json->{'category'}->{'id'};
+
+        $user = $userRepository->find($userId);
+        $post->setUser($user);
+        $postStatus = $postStatusRepository->find($postStatusId);
+        $post->setPostStatus($postStatus);
+        $visibility = $visibilityRepository->find($visibilityId);
+        $post->setVisibility($visibility);
+        $wearCondition = $wearConditionRepository->find($wearConditionId);
+        $post->setWearCondition($wearCondition);
+        $category = $categoryRepository->find($categoryId);
+        $post->setCategory($category);
+
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($post);
+        $entityManager->flush();
+
+        return new Response('Le post à été créé');
+    }
+
+    /**
      * @Route("/{id}/edit", name="edit_post", methods={"GET","PUT"})
      */
-    public function edit(Request $request, Post $post, SerializerInterface $serializer, UserRepository $userRepository, 
+    public function apiEditPost(Request $request, Post $post, SerializerInterface $serializer, 
     PostStatusRepository $postStatusRepository, VisibilityRepository $visibilityRepository, 
     WearConditionRepository $wearConditionRepository, CategoryRepository $categoryRepository)
     {
@@ -101,9 +139,42 @@ class PostController extends AbstractController
     }
 
     /**
+     * @Route("/post/{id}/new-picture", name="new_picture_post", methods={"GET","POST"})
+     */
+    public function apiNewPicturePost(Request $request, Post $post)
+    {
+        /** @var UploadedFile $picture */
+        $picture = $request->files->get('image');
+        
+        if ($picture) {
+            $filename = pathinfo($picture->getClientOriginalName(), PATHINFO_FILENAME);
+            try {
+
+                $picture->move(
+                    $this->getParameter('pictures_directory'),
+                    $filename
+                );
+                
+                $post->setPicture($filename);
+
+                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager->merge($post);
+                $entityManager->flush(); 
+
+                return new Response('L\'image est stockée');
+
+            } catch (FileException $e) {
+                // ... handle exception if something happens during file uploadf8f3577217a7fb6b58745689a06a1405
+            }
+        }
+
+        return new Response('Pas d\'image');
+    }
+
+    /**
      * @Route("/post/{id}", name="delete_post", methods={"DELETE"})
      */
-    public function apiDeletePost(Request $request, Post $post)
+    public function apiDeletePost(Post $post)
     {
         if (!$post) {
             throw $this->createNotFoundException(
@@ -144,77 +215,6 @@ class PostController extends AbstractController
         $entityManager->flush();
 
         return new Response('Le commentaire à été créé');
-    }
-
-    /**
-     * @Route("/post-new", name="create_post", methods={"GET","POST"})
-     */
-    public function apiCreatePost(Request $request, SerializerInterface $serializer, UserRepository $userRepository, 
-    PostStatusRepository $postStatusRepository, VisibilityRepository $visibilityRepository, 
-    WearConditionRepository $wearConditionRepository, CategoryRepository $categoryRepository)
-    {
-        $jsonData = $request->getContent();
-
-        $post = $serializer->deserialize($jsonData, Post::class, 'json');
-
-        $parsed_json = json_decode($jsonData);
-
-        $userId = $parsed_json->{'user'}->{'id'};
-        $postStatusId = $parsed_json->{'postStatus'}->{'id'};
-        $visibilityId = $parsed_json->{'visibility'}->{'id'};
-        $wearConditionId = $parsed_json->{'wearCondition'}->{'id'};
-        $categoryId = $parsed_json->{'category'}->{'id'};
-
-        $user = $userRepository->find($userId);
-        $post->setUser($user);
-        $postStatus = $postStatusRepository->find($postStatusId);
-        $post->setPostStatus($postStatus);
-        $visibility = $visibilityRepository->find($visibilityId);
-        $post->setVisibility($visibility);
-        $wearCondition = $wearConditionRepository->find($wearConditionId);
-        $post->setWearCondition($wearCondition);
-        $category = $categoryRepository->find($categoryId);
-        $post->setCategory($category);
-
-
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->persist($post);
-        $entityManager->flush();
-
-        return new Response('Le post à été créé');
-    }
-
-    /**
-     * @Route("/post/{id}/new-picture", name="new_picture_post", methods={"GET","POST"})
-     */
-    public function apiPicturePost(Request $request, Post $post)
-    {
-        /** @var UploadedFile $picture */
-        $picture = $request->files->get('image');
-        
-        if ($picture) {
-            $filename = pathinfo($picture->getClientOriginalName(), PATHINFO_FILENAME);
-            try {
-
-                $picture->move(
-                    $this->getParameter('pictures_directory'),
-                    $filename
-                );
-                
-                $post->setPicture($filename);
-
-                $entityManager = $this->getDoctrine()->getManager();
-                $entityManager->merge($post);
-                $entityManager->flush(); 
-
-                return new Response('L\'image est stockée');
-
-            } catch (FileException $e) {
-                // ... handle exception if something happens during file uploadf8f3577217a7fb6b58745689a06a1405
-            }
-        }
-
-        return new Response('Pas d\'image');
     }
 
     /**
