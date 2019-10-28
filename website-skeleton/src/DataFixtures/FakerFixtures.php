@@ -97,7 +97,7 @@ class FakerFixtures extends Fixture
         ));    
         
         // Posts
-        $populator->addEntity('App\Entity\Post', 500, array(
+        $populator->addEntity('App\Entity\Post', 100, array(
             'title' => function () use ($generator) {
                 return $generator->sentence();
             },
@@ -115,6 +115,13 @@ class FakerFixtures extends Fixture
             },
             'nbLikes' => function () {
                 return rand(0, 10);
+            },
+        ));
+
+        // Commentaries
+        $populator->addEntity('App\Entity\Commentary', 500, array(
+            'body' => function () use ($generator) {
+                return $generator->text();
             },
         ));
 

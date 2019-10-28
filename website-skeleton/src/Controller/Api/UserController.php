@@ -20,6 +20,21 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 class UserController extends AbstractController
 {
     /**
+     * @Route("/api/users", name="get_users", methods={"GET"})
+     */
+    public function apiGetUsers(UserRepository $userRepository, SerializerInterface $serializer)
+    {
+        $users = $userRepository->findAll();
+        
+        $jsonData = $serializer->serialize($users, 'json', [
+            'groups' => 'user_get',
+        ]);
+
+
+        return new Response($jsonData);
+    }
+    
+    /**
      * @Route("/api/user/{id}", name="get_user", methods={"GET"})
      */
     public function apiGetUser(User $user = null, SerializerInterface $serializer)
@@ -34,23 +49,6 @@ class UserController extends AbstractController
             'groups' => 'user_get',
         ]);
 
-        //dd($jsonData);
-
-        return new Response($jsonData);
-    }
-
-    /**
-     * @Route("/api/users", name="get_users", methods={"GET"})
-     */
-    public function apiGetUsers(UserRepository $userRepository, SerializerInterface $serializer)
-    {
-        $users = $userRepository->findAll();
-        
-        $jsonData = $serializer->serialize($users, 'json', [
-            'groups' => 'user_get',
-        ]);
-
-    //dd($jsonData);
 
         return new Response($jsonData);
     }
@@ -63,9 +61,10 @@ class UserController extends AbstractController
         $jsonData = $request->getContent();
 
         $user = $serializer->deserialize($jsonData, User::class, 'json');
+        $password = $user->getPassword();
 
         $this->passwordEncoder = $passwordEncoder;
-        $encodedPassword = $this->passwordEncoder->encodePassword($user, ':password');
+        $encodedPassword = $this->passwordEncoder->encodePassword($user, $password);
 
         $user->setPassword($encodedPassword);
         $user->setRoles(['ROLE_USER']);
@@ -87,7 +86,7 @@ class UserController extends AbstractController
         $userId = $request->request->get('userId');
 
         $user = $userRepository->findById($userId);
-        //dd($picture);
+
         if ($picture) {
             $filename = pathinfo($picture->getClientOriginalName(), PATHINFO_FILENAME);
 
@@ -121,7 +120,7 @@ class UserController extends AbstractController
         $user = $serializer->deserialize($jsonData, User::class, 'json');
         $lat = $user->getLat();
         $lng = $user->getLng();
-        //dd($lat, $lng);
+
         $closePosts = $postRepository->findAllClosePosts($lat, $lng);
 
         $jsonData = $serializer->serialize($closePosts, 'json', [

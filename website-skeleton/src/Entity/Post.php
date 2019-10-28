@@ -118,6 +118,7 @@ class Post
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Commentary", mappedBy="post", orphanRemoval=true)
+     * @Groups("post_get")
      */
     private $commentaries;
 
