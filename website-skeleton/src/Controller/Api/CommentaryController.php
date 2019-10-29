@@ -35,7 +35,7 @@ class CommentaryController extends AbstractController
     /**
      * @Route("/commentary/{id}/edit", name="edit_commentary", methods={"GET","PUT"})
      */
-    public function apiEditComentary(Request $request, Commentary $commentary, SerializerInterface $serializer)
+    public function apiEditComentary(Request $request, Commentary $commentary = null, SerializerInterface $serializer)
     {
         if (!$commentary) {
             throw $this->createNotFoundException(
@@ -60,7 +60,7 @@ class CommentaryController extends AbstractController
     /**
      * @Route("/commentary/{id}", name="delete_commentary", methods={"DELETE"})
      */
-    public function apiDeleteCommentary(Commentary $commentary)
+    public function apiDeleteCommentary(Commentary $commentary = null)
     {
         if (!$commentary) {
             throw $this->createNotFoundException(

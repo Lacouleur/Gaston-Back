@@ -6,11 +6,20 @@ easy_admin:
         - label: 'Gérer'
           icon: 'tools'
           children:
+            - {entity: 'User', icon: 'list', label: 'Utilisateur'}
+            - {entity: 'Post', icon: 'list', label: 'Post'}
+            - {entity: 'Commentary', icon: 'list', label: 'Commentaire'}
             - {entity: 'Category', icon: 'list', label: 'Catégorie'}
             - {entity: 'PostStatus', icon: 'check', label: 'Statut'}
             - {entity: 'Visibility', icon: 'eye', label: 'Visibilité'}
             - {entity: 'WearCondition', icon: 'question', label: 'Usure'}
     entities:
+        User:
+          class: App\Entity\User
+        Post:
+          class: App\Entity\Post
+        Commentary:
+          class: App\Entity\Commentary
         PostStatus:
           class: App\Entity\PostStatus
         Category:

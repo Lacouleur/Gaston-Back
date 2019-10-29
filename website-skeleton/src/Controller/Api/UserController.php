@@ -77,9 +77,9 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/user/{id}/edit", name="edit_user", methods={"GET","PUT"})
+     * @Route("/api/user/{id}/edit", name="edit_user", methods={"GET","PUT"})
      */
-    public function apiEditUser(Request $request, User $user, SerializerInterface $serializer)
+    public function apiEditUser(Request $request, User $user = null, SerializerInterface $serializer)
     {
         if (!$user) {
             throw $this->createNotFoundException(
@@ -120,7 +120,7 @@ class UserController extends AbstractController
     /**
      * @Route("/api/user/{id}/new-picture", name="new_picture__user", methods={"GET","POST"})
      */
-    public function apiNewPictureUser(Request $request, User $user)
+    public function apiNewPictureUser(Request $request, User $user = null)
     {
         if (!$user) {
             throw $this->createNotFoundException(
@@ -157,7 +157,7 @@ class UserController extends AbstractController
     /**
      * @Route("/api/user/{id}/close", name="close_user", methods={"GET"})
      */
-    public function apiClosePosts(User $user, PostRepository $postRepository, SerializerInterface $serializer)
+    public function apiClosePosts(User $user = null, PostRepository $postRepository, SerializerInterface $serializer)
     {
         if (!$user) {
             throw $this->createNotFoundException(
