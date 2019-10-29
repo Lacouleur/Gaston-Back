@@ -2,10 +2,6 @@ security:
     encoders:
         App\Entity\User:
             algorithm: auto
-
-
-
-
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
     providers:
         # used to reload user from session & other features (e.g. switch_user)
@@ -22,7 +18,6 @@ security:
                 check_path:               /api/login_check
                 success_handler:          lexik_jwt_authentication.handler.authentication_success
                 failure_handler:          lexik_jwt_authentication.handler.authentication_failure
-
         api:
             pattern:   ^/api
             stateless: true

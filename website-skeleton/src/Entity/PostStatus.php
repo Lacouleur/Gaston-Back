@@ -131,8 +131,4 @@ class PostStatus
     {
         $this->updatedAt = new \DateTime();
     }
-    public function __toString()
-    {
-        return $this->label;
-    }
 }
