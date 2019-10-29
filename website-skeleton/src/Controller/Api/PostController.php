@@ -56,7 +56,7 @@ class PostController extends AbstractController
     }
 
     /**
-     * @Route("/post-new", name="create_post", methods={"GET","POST"})
+     * @Route("/post-new", name="create_post", methods={"POST"})
      */
     public function apiCreatePost(Request $request, SerializerInterface $serializer, UserRepository $userRepository, 
     PostStatusRepository $postStatusRepository, VisibilityRepository $visibilityRepository, 
@@ -94,12 +94,18 @@ class PostController extends AbstractController
     }
 
     /**
-     * @Route("/{id}/edit", name="edit_post", methods={"GET","PUT"})
+     * @Route("/post/{id}/edit", name="edit_post", methods={"GET","PUT"})
      */
     public function apiEditPost(Request $request, Post $post, SerializerInterface $serializer, 
     PostStatusRepository $postStatusRepository, VisibilityRepository $visibilityRepository, 
     WearConditionRepository $wearConditionRepository, CategoryRepository $categoryRepository)
     {
+        if (!$post) {
+            throw $this->createNotFoundException(
+                'Post not found'
+            );
+        }
+
         $jsonData = $request->getContent();
 
         $postUpdate = $serializer->deserialize($jsonData, Post::class, 'json');
@@ -143,6 +149,12 @@ class PostController extends AbstractController
      */
     public function apiNewPicturePost(Request $request, Post $post)
     {
+        if (!$post) {
+            throw $this->createNotFoundException(
+                'Post not found'
+            );
+        }
+
         /** @var UploadedFile $picture */
         $picture = $request->files->get('image');
         
@@ -218,13 +230,16 @@ class PostController extends AbstractController
     }
 
     /**
-     * @Route("/close/post", name="close_post", methods={"GET","POST"})
+     * @Route("/post/{id}/close", name="close_post", methods={"GET"})
      */
-    public function apiClosePosts(Request $request, PostRepository $postRepository, SerializerInterface $serializer)
+    public function apiClosePosts(Post $post, PostRepository $postRepository, SerializerInterface $serializer)
     {
-        $jsonData = $request->getContent();
-
-        $post = $serializer->deserialize($jsonData, Post::class, 'json');
+        if (!$post) {
+            throw $this->createNotFoundException(
+                'Post not found'
+            );
+        }
+        
         $lat = $post->getLat();
         $lng = $post->getLng();
 

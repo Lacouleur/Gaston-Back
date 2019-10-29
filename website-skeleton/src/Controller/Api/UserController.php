@@ -77,15 +77,59 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/api/user-picture", name="picture_user", methods={"GET","POST"})
+     * @Route("/user/{id}/edit", name="edit_user", methods={"GET","PUT"})
      */
-    public function apiPictureUser(Request $request, UserRepository $userRepository)
+    public function apiEditUser(Request $request, User $user, SerializerInterface $serializer)
     {
+        if (!$user) {
+            throw $this->createNotFoundException(
+                'User not found'
+            );
+        }
+
+        $jsonData = $request->getContent();
+
+        $userUpdate = $serializer->deserialize($jsonData, User::class, 'json');
+
+        $userEmail = $userUpdate->getEmail();
+        $user->setEmail($userEmail);
+        $userFirstname = $userUpdate->getFirstname();
+        $user->setFirstname($userFirstname);
+        $userLastname = $userUpdate->getLastname();
+        $user->setLastname($userLastname);
+        $userPhoneNumber = $userUpdate->getPhoneNumber();
+        $user->setPhoneNumber($userPhoneNumber);
+        $userOrganisation = $userUpdate->getOrganisation();
+        $user->setOrganisation($userOrganisation);
+        $userDescription = $userUpdate->getDescription();
+        $user->setDescription($userDescription);
+        $userAddressLabel = $userUpdate->getAddressLabel();
+        $user->setAddressLabel($userAddressLabel);
+        $userLat = $userUpdate->getLat();
+        $user->setLat($userLat);
+        $userLng = $userUpdate->getLng();
+        $user->setLng($userLng);
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->merge($user);
+        $entityManager->flush();
+
+        return new Response('L\'utilisateur à été modifié');  
+    }
+
+    /**
+     * @Route("/api/user/{id}/new-picture", name="new_picture__user", methods={"GET","POST"})
+     */
+    public function apiNewPictureUser(Request $request, User $user)
+    {
+        if (!$user) {
+            throw $this->createNotFoundException(
+                'User not found'
+            );
+        }
+
         /** @var UploadedFile $picture */
         $picture = $request->files->get('image');
-        $userId = $request->request->get('userId');
-
-        $user = $userRepository->findById($userId);
 
         if ($picture) {
             $filename = pathinfo($picture->getClientOriginalName(), PATHINFO_FILENAME);
@@ -99,10 +143,10 @@ class UserController extends AbstractController
                 // ... handle exception if something happens during file upload
             }
 
-            $user[0]->setPicture($filename);
+            $user->setPicture($filename);
 
                 $entityManager = $this->getDoctrine()->getManager();
-                $entityManager->persist($user[0]);
+                $entityManager->merge($user);
                 $entityManager->flush();
     
         }
@@ -111,13 +155,16 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/api/close/user", name="close_user", methods={"GET","POST"})
+     * @Route("/api/user/{id}/close", name="close_user", methods={"GET"})
      */
-    public function apiClosePosts(Request $request, PostRepository $postRepository, SerializerInterface $serializer)
+    public function apiClosePosts(User $user, PostRepository $postRepository, SerializerInterface $serializer)
     {
-        $jsonData = $request->getContent();
-
-        $user = $serializer->deserialize($jsonData, User::class, 'json');
+        if (!$user) {
+            throw $this->createNotFoundException(
+                'User not found'
+            );
+        }
+        
         $lat = $user->getLat();
         $lng = $user->getLng();
 
