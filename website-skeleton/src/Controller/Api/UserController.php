@@ -61,7 +61,39 @@ class UserController extends AbstractController
         $jsonData = $request->getContent();
 
         $user = $serializer->deserialize($jsonData, User::class, 'json');
+
         $password = $user->getPassword();
+        //    if (!$password) {
+        //        return new Response('Le mot de passe est vide');
+        //    }
+//
+        //$username = $user->getUsername();
+        //    if (!$username) {
+        //        return new Response('Le nom d\'utilisateur est vide');
+        //    }
+        //    if (strlen($username) < 4) {
+        //        return new Response('Le nom d\'utilisateur est trop court');
+        //    }
+//
+        //$password = $user->getPassword();
+        //    if (!$password) {
+        //        return new Response('Le mot de passe est vide');
+        //    }
+//
+        //$email = $user->getEmail();
+        //    if (!$email) {
+        //        return new Response('L\'email est vide');
+        //    }
+        //    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        //        return new Response('L\'email n\'est pas valide');
+        //    }
+//
+        //$addressLabel = $user->getAddressLabel();
+        //$lat = $user->getLat();
+        //$lng = $user->getLng();
+        //    if(!$addressLabel || !$lat || !$lng) {
+        //        return new Response('L\'adresse est incomplête');
+        //    }
 
         $this->passwordEncoder = $passwordEncoder;
         $encodedPassword = $this->passwordEncoder->encodePassword($user, $password);

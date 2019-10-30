@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Api;
 
 use App\Repository\PostRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -26,12 +26,16 @@ class MapController extends AbstractController
         $lat = $parsed_json->{'lat'};
         $lng = $parsed_json->{'lng'};
 
-        $closePosts = $postRepository->findAllClosePosts($lat, $lng, $zoom);
+        if ($zoom > 15) {
+            $closePosts = $postRepository->findAllClosePosts($lat, $lng);
 
-        $jsonData = $serializer->serialize($closePosts, 'json', [
-            'groups' => 'post_get',
-        ]);
+            $jsonData = $serializer->serialize($closePosts, 'json', [
+                'groups' => 'post_get',
+            ]);
 
-        return new Response($jsonData);
+            return new Response($jsonData);
+        }
+
+        return new Response();
     }
 }
