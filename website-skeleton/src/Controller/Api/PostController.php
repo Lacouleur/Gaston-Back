@@ -96,7 +96,7 @@ class PostController extends AbstractController
     /**
      * @Route("/post/{id}/edit", name="edit_post", methods={"GET","PUT"})
      */
-    public function apiEditPost(Request $request, Post $post, SerializerInterface $serializer, 
+    public function apiEditPost(Request $request, Post $post = null, SerializerInterface $serializer, 
     PostStatusRepository $postStatusRepository, VisibilityRepository $visibilityRepository, 
     WearConditionRepository $wearConditionRepository, CategoryRepository $categoryRepository)
     {
@@ -147,7 +147,7 @@ class PostController extends AbstractController
     /**
      * @Route("/post/{id}/new-picture", name="new_picture_post", methods={"GET","POST"})
      */
-    public function apiNewPicturePost(Request $request, Post $post)
+    public function apiNewPicturePost(Request $request, Post $post = null)
     {
         if (!$post) {
             throw $this->createNotFoundException(
@@ -186,7 +186,7 @@ class PostController extends AbstractController
     /**
      * @Route("/post/{id}", name="delete_post", methods={"DELETE"})
      */
-    public function apiDeletePost(Post $post)
+    public function apiDeletePost(Post $post = null)
     {
         if (!$post) {
             throw $this->createNotFoundException(
@@ -232,7 +232,7 @@ class PostController extends AbstractController
     /**
      * @Route("/post/{id}/close", name="close_post", methods={"GET"})
      */
-    public function apiClosePosts(Post $post, PostRepository $postRepository, SerializerInterface $serializer)
+    public function apiClosePosts(Post $post = null, PostRepository $postRepository, SerializerInterface $serializer)
     {
         if (!$post) {
             throw $this->createNotFoundException(

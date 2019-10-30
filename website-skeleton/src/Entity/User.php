@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\Validator\Constraint as Assert;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
@@ -30,12 +30,19 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=64)
      * @Groups("user_get")
+     * @Assert\NotBlank
+     * @Assert\Length(min=4)
      */
     private $username;
 
     /**
      * @ORM\Column(type="string", length=64)
      * @Groups("user_get")
+     * @Assert\NotBlank
+     * @Assert\Email(
+     *     message = "The email '{{ value }}' is not a valid email.",
+     *     checkMX = true
+     * )
      */
     private $email;
 
@@ -43,24 +50,29 @@ class User implements UserInterface
      * @var string The hashed password
      * @ORM\Column(type="string")
      * @Groups("user_get")
+     * @Assert\NotBlank
+     * @Assert\Length(min=4)
      */
     private $password;
 
     /**
      * @ORM\Column(type="string", length=128)
      * @Groups("user_get")
+     * @Assert\NotBlank
      */
     private $addressLabel;
 
     /**
      * @ORM\Column(type="float")
      * @Groups("user_get")
+     * @Assert\NotBlank
      */
     private $lat;
 
     /**
      * @ORM\Column(type="float")
      * @Groups("user_get")
+     * @Assert\NotBlank
      */
     private $lng;
 
