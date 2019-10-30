@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @Route("/api", name="api_")
@@ -35,7 +36,7 @@ class CommentaryController extends AbstractController
     /**
      * @Route("/commentary/{id}/edit", name="edit_commentary", methods={"GET","PUT"})
      */
-    public function apiEditComentary(Request $request, Commentary $commentary = null, SerializerInterface $serializer)
+    public function apiEditComentary(Request $request, Commentary $commentary = null, SerializerInterface $serializer, ValidatorInterface $validator)
     {
         if (!$commentary) {
             throw $this->createNotFoundException(
@@ -50,11 +51,23 @@ class CommentaryController extends AbstractController
         $commentaryBody = $commentaryUpdate->getBody();
         $commentary->setBody($commentaryBody);
 
+        $errors = $validator->validate($commentary);
+
+        if (count($errors) > 0) {
+            $jsonErrors = [];
+            
+            foreach ($errors as $error) {
+                $jsonErrors[$error->getPropertyPath()] = $error->getMessage();
+            }
+            
+            return $this->json($jsonErrors, 422);
+        }
+
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->merge($commentary);
         $entityManager->flush();
 
-        return new Response('Le commentaire à été modifié');  
+        return new Response(json_encode(['success' => 'Le commentaire a été modifié']));
     }
 
     /**
@@ -72,7 +85,7 @@ class CommentaryController extends AbstractController
         $entityManager->remove($commentary);
         $entityManager->flush();
 
-        return new Response('Le commentaire à été supprimé');
+        return new Response(json_encode(['success' => 'Le commentaire a été supprimé']));
     }
 
 }

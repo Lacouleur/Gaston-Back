@@ -17,6 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @Route("/api", name="api_")
@@ -59,12 +60,24 @@ class PostController extends AbstractController
      * @Route("/post-new", name="create_post", methods={"POST"})
      */
     public function apiCreatePost(Request $request, SerializerInterface $serializer, UserRepository $userRepository, 
-    PostStatusRepository $postStatusRepository, VisibilityRepository $visibilityRepository, 
-    WearConditionRepository $wearConditionRepository, CategoryRepository $categoryRepository)
+    PostStatusRepository $postStatusRepository, VisibilityRepository $visibilityRepository, WearConditionRepository $wearConditionRepository, 
+    CategoryRepository $categoryRepository, ValidatorInterface $validator)
     {
         $jsonData = $request->getContent();
 
         $post = $serializer->deserialize($jsonData, Post::class, 'json');
+
+        $errors = $validator->validate($post);
+
+        if (count($errors) > 0) {
+            $jsonErrors = [];
+            
+            foreach ($errors as $error) {
+                $jsonErrors[$error->getPropertyPath()] = $error->getMessage();
+            }
+            
+            return $this->json($jsonErrors, 422);
+        }
 
         $parsed_json = json_decode($jsonData);
 
@@ -90,7 +103,7 @@ class PostController extends AbstractController
         $entityManager->persist($post);
         $entityManager->flush();
 
-        return new Response('Le post à été créé');
+        return new Response(json_encode(['success' => 'Le post a été créé']));
     }
 
     /**
@@ -98,7 +111,7 @@ class PostController extends AbstractController
      */
     public function apiEditPost(Request $request, Post $post = null, SerializerInterface $serializer, 
     PostStatusRepository $postStatusRepository, VisibilityRepository $visibilityRepository, 
-    WearConditionRepository $wearConditionRepository, CategoryRepository $categoryRepository)
+    WearConditionRepository $wearConditionRepository, CategoryRepository $categoryRepository, ValidatorInterface $validator)
     {
         if (!$post) {
             throw $this->createNotFoundException(
@@ -137,11 +150,23 @@ class PostController extends AbstractController
         $postLng = $postUpdate->getLng();
         $post->setLng($postLng);
 
+        $errors = $validator->validate($post);
+
+        if (count($errors) > 0) {
+            $jsonErrors = [];
+            
+            foreach ($errors as $error) {
+                $jsonErrors[$error->getPropertyPath()] = $error->getMessage();
+            }
+            
+            return $this->json($jsonErrors, 422);
+        }
+
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->merge($post);
         $entityManager->flush();
 
-        return new Response('Le post à été modifié');  
+        return new Response(json_encode(['success' => 'Le post a été modifié']));
     }
 
     /**
@@ -173,14 +198,14 @@ class PostController extends AbstractController
                 $entityManager->merge($post);
                 $entityManager->flush(); 
 
-                return new Response('L\'image est stockée');
+                return new Response(json_encode(['success' => 'L\'image est stockée']));
 
             } catch (FileException $e) {
                 // ... handle exception if something happens during file uploadf8f3577217a7fb6b58745689a06a1405
             }
         }
 
-        return new Response('Pas d\'image');
+        return new Response(json_encode(['fail' => 'Pas d\'image']));
     }
 
     /**
@@ -198,13 +223,14 @@ class PostController extends AbstractController
         $entityManager->remove($post);
         $entityManager->flush();
 
-        return new Response('Le post à été supprimé');
+        return new Response(json_encode(['success' => 'Le post a été supprimé']));
     }
 
     /**
      * @Route("/post/{id}/new-commentary", name="new_commentary", methods={"GET","POST"})
      */
-    public function apiNewCommentary(Post $post = null, Request $request, SerializerInterface $serializer, UserRepository $userRepository)
+    public function apiNewCommentary(Post $post = null, Request $request, SerializerInterface $serializer, 
+    UserRepository $userRepository, ValidatorInterface $validator)
     {
         if (!$post) {
             throw $this->createNotFoundException(
@@ -221,12 +247,24 @@ class PostController extends AbstractController
         $commentary = $serializer->deserialize($jsonData, Commentary::class, 'json');
         $commentary->setPost($post);
         $commentary->setUser($user);
+
+        $errors = $validator->validate($commentary);
+
+        if (count($errors) > 0) {
+            $jsonErrors = [];
+            
+            foreach ($errors as $error) {
+                $jsonErrors[$error->getPropertyPath()] = $error->getMessage();
+            }
+            
+            return $this->json($jsonErrors, 422);
+        }
         
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($commentary);
         $entityManager->flush();
 
-        return new Response('Le commentaire à été créé');
+        return new Response(json_encode(['success' => 'Le commentaire a été créé']));
     }
 
     /**

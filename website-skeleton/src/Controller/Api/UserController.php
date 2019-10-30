@@ -13,6 +13,7 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @Route(name="api_")
@@ -56,45 +57,26 @@ class UserController extends AbstractController
     /**
      * @Route("/user-new", name="create_user", methods={"GET","POST"})
      */
-    public function apiCreateUser(Request $request, UserPasswordEncoderInterface $passwordEncoder, SerializerInterface $serializer)
+    public function apiCreateUser(Request $request, UserPasswordEncoderInterface $passwordEncoder, SerializerInterface $serializer, ValidatorInterface $validator)
     {
         $jsonData = $request->getContent();
 
         $user = $serializer->deserialize($jsonData, User::class, 'json');
 
-        $password = $user->getPassword();
-        //    if (!$password) {
-        //        return new Response('Le mot de passe est vide');
-        //    }
-//
-        //$username = $user->getUsername();
-        //    if (!$username) {
-        //        return new Response('Le nom d\'utilisateur est vide');
-        //    }
-        //    if (strlen($username) < 4) {
-        //        return new Response('Le nom d\'utilisateur est trop court');
-        //    }
-//
-        //$password = $user->getPassword();
-        //    if (!$password) {
-        //        return new Response('Le mot de passe est vide');
-        //    }
-//
-        //$email = $user->getEmail();
-        //    if (!$email) {
-        //        return new Response('L\'email est vide');
-        //    }
-        //    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        //        return new Response('L\'email n\'est pas valide');
-        //    }
-//
-        //$addressLabel = $user->getAddressLabel();
-        //$lat = $user->getLat();
-        //$lng = $user->getLng();
-        //    if(!$addressLabel || !$lat || !$lng) {
-        //        return new Response('L\'adresse est incomplête');
-        //    }
+        $errors = $validator->validate($user);
 
+        if (count($errors) > 0) {
+            $jsonErrors = [];
+
+            foreach ($errors as $error) {
+                $jsonErrors[$error->getPropertyPath()] = $error->getMessage();
+            }
+            
+            return $this->json($jsonErrors, 422);
+        }
+
+        $password = $user->getPassword();
+        
         $this->passwordEncoder = $passwordEncoder;
         $encodedPassword = $this->passwordEncoder->encodePassword($user, $password);
 
@@ -105,13 +87,13 @@ class UserController extends AbstractController
         $entityManager->persist($user);
         $entityManager->flush();
 
-        return new Response('L\'utilisateur à été créé');
+        return new Response(json_encode(['success' => 'L\'utilisateur a été créé']));
     }
 
     /**
      * @Route("/api/user/{id}/edit", name="edit_user", methods={"GET","PUT"})
      */
-    public function apiEditUser(Request $request, User $user = null, SerializerInterface $serializer)
+    public function apiEditUser(Request $request, User $user = null, SerializerInterface $serializer, ValidatorInterface $validator)
     {
         if (!$user) {
             throw $this->createNotFoundException(
@@ -142,11 +124,23 @@ class UserController extends AbstractController
         $userLng = $userUpdate->getLng();
         $user->setLng($userLng);
 
+        $errors = $validator->validate($user);
+
+        if (count($errors) > 0) {
+            $jsonErrors = [];
+            
+            foreach ($errors as $error) {
+                $jsonErrors[$error->getPropertyPath()] = $error->getMessage();
+            }
+            
+            return $this->json($jsonErrors, 422);
+        }
+
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->merge($user);
         $entityManager->flush();
 
-        return new Response('L\'utilisateur à été modifié');  
+        return new Response(json_encode(['success' => 'L\'utilisateur a été modifié']));
     }
 
     /**
@@ -171,19 +165,21 @@ class UserController extends AbstractController
                     $this->getParameter('pictures_directory'),
                     $filename
                 );
-            } catch (FileException $e) {
-                // ... handle exception if something happens during file upload
-            }
 
             $user->setPicture($filename);
 
-                $entityManager = $this->getDoctrine()->getManager();
-                $entityManager->merge($user);
-                $entityManager->flush();
-    
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->merge($user);
+            $entityManager->flush();
+
+            return new Response(json_encode(['success' => 'L\'image est stockée']));
+
+            } catch (FileException $e) {
+                // ... handle exception if something happens during file upload
+            }
         }
 
-        return new Response('L\'image est stockée!');
+        return new Response(json_encode(['fail' => 'Pas d\'image']));
     }
 
     /**
