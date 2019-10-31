@@ -6,16 +6,30 @@ easy_admin:
         - label: 'Gérer'
           icon: 'tools'
           children:
-            - {entity: 'Category', icon: 'list', label: 'Catégorie'}
+            - {entity: 'User', icon: 'users', label: 'Utilisateurs'}
+            - {entity: 'Category', icon: 'list', label: 'Catégories'}
+            - {entity: 'Post', icon: 'newspaper', label: 'Annonces'}
             - {entity: 'PostStatus', icon: 'check', label: 'Statut'}
             - {entity: 'Visibility', icon: 'eye', label: 'Visibilité'}
-            - {entity: 'WearCondition', icon: 'question', label: 'Usure'}
+            - {entity: 'WearCondition', icon: 'grin', label: 'Etat'}
+            - {entity: 'Commentary', icon: 'comments', label: 'Commentaires'}
+            
     entities:
         PostStatus:
           class: App\Entity\PostStatus
+          disabled_actions: ['delete']
         Category:
           class: App\Entity\Category
+          disabled_actions: ['delete']
         Visibility:
           class: App\Entity\Visibility
+          disabled_actions: ['delete']
         WearCondition:
           class: App\Entity\WearCondition
+          disabled_actions: ['delete']
+        User:
+          class: App\Entity\User
+        Post:
+          class: App\Entity\Post
+        Commentary:
+          class: App\Entity\Commentary

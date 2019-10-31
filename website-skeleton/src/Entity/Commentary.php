@@ -102,4 +102,8 @@ class Commentary
 
         return $this;
     }
+    public function __toString()
+    {
+        return $this->body;
+    }
 }
