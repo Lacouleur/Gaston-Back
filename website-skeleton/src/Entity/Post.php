@@ -6,7 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Validator\Constraint as Assert;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\PostRepository")
@@ -30,12 +30,15 @@ class Post
     /**
      * @ORM\Column(type="string", length=128)
      * @Groups("post_get")
+     * @Assert\NotBlank
+     * @Assert\Length(min=4)
      */
     private $title;
 
     /**
      * @ORM\Column(type="text")
-     * @Groups("post_get")
+     * @Groups("post_get")@Assert\NotBlank
+     * @Assert\Length(min=4)
      */
     private $description;
 
@@ -48,18 +51,21 @@ class Post
     /**
      * @ORM\Column(type="string", length=128)
      * @Groups("post_get")
+     * @Assert\NotBlank
      */
     private $addressLabel;
 
     /**
      * @ORM\Column(type="float")
      * @Groups("post_get")
+     * @Assert\NotBlank
      */
     private $lat;
 
     /**
      * @ORM\Column(type="float")
      * @Groups("post_get")
+     * @Assert\NotBlank
      */
     private $lng;
 
