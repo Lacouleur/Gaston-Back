@@ -84,8 +84,7 @@ Le post à modifier est indiqué dans l'URL.
 
 ```
 {
-	"body": "Nouveau commentaire",
-	"user": 991
+	"body": "Nouveau commentaire"
 }
 ```
 Le post à modifier est indiqué dans l'URL. Toutes ces propriétés sont obligatoires.

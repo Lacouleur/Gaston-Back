@@ -117,7 +117,7 @@ class UserController extends AbstractController
         $entityManager->persist($user);
         $entityManager->flush();
 
-        return new JsonResponse(['success' => 'L\'utilisateur a été créé']);
+        return new JsonResponse(['success' => 'The user has been created']);
     }
 
     /**
@@ -131,7 +131,7 @@ class UserController extends AbstractController
             );
         }
 
-        if (!$this->apiIsSameUser($user, $userInterface, $userRepository) && !$this->apiIsAdmin($userInterface, $userRepository)) {
+        if (!$this->apiIsSameUser($user, $userInterface, $userRepository)) {
             throw $this->createAccessDeniedException();
         }
 
@@ -174,7 +174,7 @@ class UserController extends AbstractController
         $entityManager->merge($user);
         $entityManager->flush();
 
-        return new JsonResponse(['success' => 'L\'utilisateur a été modifié']);
+        return new JsonResponse(['success' => 'The user has been modified']);
     }
 
     /**
@@ -188,7 +188,7 @@ class UserController extends AbstractController
             );
         }
 
-        if (!$this->apiIsSameUser($user, $userInterface, $userRepository) && !$this->apiIsAdmin($userInterface, $userRepository)) {
+        if (!$this->apiIsSameUser($user, $userInterface, $userRepository)) {
             throw $this->createAccessDeniedException();
         }
 
@@ -210,14 +210,14 @@ class UserController extends AbstractController
             $entityManager->merge($user);
             $entityManager->flush();
 
-            return new JsonResponse(['success' => 'L\'image est stockée']);
+            return new JsonResponse(['success' => 'The picture has been saved']);
 
             } catch (FileException $e) {
                 // ... handle exception if something happens during file upload
             }
         }
 
-        return new JsonResponse(['fail' => 'Pas d\'image']);
+        return new JsonResponse(['fail' => 'Picture not found']);
     }
 
     /**

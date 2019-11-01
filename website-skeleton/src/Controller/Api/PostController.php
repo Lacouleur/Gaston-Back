@@ -130,7 +130,7 @@ class PostController extends AbstractController
         $entityManager->persist($post);
         $entityManager->flush();
 
-        return new JsonResponse(['success' => 'Le post a été créé']);
+        return new JsonResponse(['success' => 'The post has been added']);
     }
 
     /**
@@ -198,7 +198,7 @@ class PostController extends AbstractController
         $entityManager->merge($post);
         $entityManager->flush();
 
-        return new JsonResponse(['success' => 'Le post a été modifié']);
+        return new JsonResponse(['success' => 'The post has been modified']);
     }
 
     /**
@@ -212,7 +212,7 @@ class PostController extends AbstractController
             );
         }
 
-        if (!$this->apiIsSameUser($post, $userInterface, $userRepository) && !$this->apiIsAdmin($userInterface, $userRepository)) {
+        if (!$this->apiIsSameUser($post, $userInterface, $userRepository)) {
             throw $this->createAccessDeniedException();
         }
 
@@ -234,14 +234,14 @@ class PostController extends AbstractController
                 $entityManager->merge($post);
                 $entityManager->flush(); 
 
-                return new JsonResponse(['success' => 'L\'image est stockée']);
+                return new JsonResponse(['success' => 'The picture has been saved']);
 
             } catch (FileException $e) {
                 // ... handle exception if something happens during file uploadf8f3577217a7fb6b58745689a06a1405
             }
         }
 
-        return new JsonResponse(['fail' => 'Pas d\'image']);
+        return new JsonResponse(['fail' => 'Picture not found']);
     }
 
     /**
@@ -263,14 +263,14 @@ class PostController extends AbstractController
         $entityManager->remove($post);
         $entityManager->flush();
 
-        return new JsonResponse(['success' => 'Le post a été supprimé']);
+        return new JsonResponse(['success' => 'The post has been deleted']);
     }
 
     /**
      * @Route("/post/{id}/new-commentary", name="new_commentary", methods={"GET","POST"})
      */
     public function apiNewCommentary(Post $post = null, Request $request, SerializerInterface $serializer, 
-    UserRepository $userRepository, ValidatorInterface $validator)
+    UserRepository $userRepository, ValidatorInterface $validator, UserInterface $userInterface)
     {
         if (!$post) {
             throw $this->createNotFoundException(
@@ -280,14 +280,12 @@ class PostController extends AbstractController
 
         $jsonData = $request->getContent();
 
-        $parsed_json = json_decode($jsonData);
-        $userId = $parsed_json->{'user'};
-        $user = $userRepository->find($userId);
+        $user = $userRepository->findOneByUsername($userInterface->getUsername());
 
         $commentary = $serializer->deserialize($jsonData, Commentary::class, 'json');
-        $commentary->setPost($post);
         $commentary->setUser($user);
-
+        $commentary->setPost($post);
+        
         $errors = $validator->validate($commentary);
 
         if (count($errors) > 0) {
@@ -304,7 +302,7 @@ class PostController extends AbstractController
         $entityManager->persist($commentary);
         $entityManager->flush();
 
-        return new JsonResponse(['success' => 'Le commentaire a été créé']);
+        return new JsonResponse(['success' => 'The commentary has been added']);
     }
 
     /**
