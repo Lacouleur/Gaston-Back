@@ -13,6 +13,8 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -20,6 +22,30 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class UserController extends AbstractController
 {
+    private function apiIsSameUser(User $user, UserInterface $userInterface, UserRepository $userRepository)
+    {
+        $currentUser = $userRepository->findOneByUsername($userInterface->getUsername());
+        
+        if ($currentUser !== $user) {
+            return false;
+        } else {
+            return true;
+          }
+    }
+
+    private function apiIsAdmin(UserInterface $userInterface, UserRepository $userRepository)
+    {
+        $currentUser = $userRepository->findOneByUsername($userInterface->getUsername());
+        
+        $roles = $currentUser->getRoles();
+
+        if (is_array($roles) && in_array('ROLE_ADMIN', $roles)) {
+          return true;
+        } else {
+          return false;
+        }
+    }
+
     /**
      * @Route("/api/users", name="get_users", methods={"GET"})
      */
@@ -38,12 +64,16 @@ class UserController extends AbstractController
     /**
      * @Route("/api/user/{id}", name="get_user", methods={"GET"})
      */
-    public function apiGetUser(User $user = null, SerializerInterface $serializer)
+    public function apiGetUser(User $user = null, SerializerInterface $serializer, UserInterface $userInterface, UserRepository $userRepository)
     {
         if (!$user) {
             throw $this->createNotFoundException(
                 'User not found'
             );
+        }
+
+        if (!$this->apiIsSameUser($user, $userInterface, $userRepository) && !$this->apiIsAdmin($userInterface, $userRepository)) {
+            throw $this->createAccessDeniedException();
         }
 
         $jsonData = $serializer->serialize($user, 'json', [
@@ -87,18 +117,22 @@ class UserController extends AbstractController
         $entityManager->persist($user);
         $entityManager->flush();
 
-        return new Response(json_encode(['success' => 'L\'utilisateur a été créé']));
+        return new JsonResponse(['success' => 'L\'utilisateur a été créé']);
     }
 
     /**
      * @Route("/api/user/{id}/edit", name="edit_user", methods={"GET","PUT"})
      */
-    public function apiEditUser(Request $request, User $user = null, SerializerInterface $serializer, ValidatorInterface $validator)
+    public function apiEditUser(Request $request, User $user = null, SerializerInterface $serializer, ValidatorInterface $validator, UserInterface $userInterface, UserRepository $userRepository)
     {
         if (!$user) {
             throw $this->createNotFoundException(
                 'User not found'
             );
+        }
+
+        if (!$this->apiIsSameUser($user, $userInterface, $userRepository) && !$this->apiIsAdmin($userInterface, $userRepository)) {
+            throw $this->createAccessDeniedException();
         }
 
         $jsonData = $request->getContent();
@@ -140,18 +174,22 @@ class UserController extends AbstractController
         $entityManager->merge($user);
         $entityManager->flush();
 
-        return new Response(json_encode(['success' => 'L\'utilisateur a été modifié']));
+        return new JsonResponse(['success' => 'L\'utilisateur a été modifié']);
     }
 
     /**
      * @Route("/api/user/{id}/new-picture", name="new_picture__user", methods={"GET","POST"})
      */
-    public function apiNewPictureUser(Request $request, User $user = null)
+    public function apiNewPictureUser(Request $request, User $user = null, UserInterface $userInterface, UserRepository $userRepository)
     {
         if (!$user) {
             throw $this->createNotFoundException(
                 'User not found'
             );
+        }
+
+        if (!$this->apiIsSameUser($user, $userInterface, $userRepository) && !$this->apiIsAdmin($userInterface, $userRepository)) {
+            throw $this->createAccessDeniedException();
         }
 
         /** @var UploadedFile $picture */
@@ -172,25 +210,29 @@ class UserController extends AbstractController
             $entityManager->merge($user);
             $entityManager->flush();
 
-            return new Response(json_encode(['success' => 'L\'image est stockée']));
+            return new JsonResponse(['success' => 'L\'image est stockée']);
 
             } catch (FileException $e) {
                 // ... handle exception if something happens during file upload
             }
         }
 
-        return new Response(json_encode(['fail' => 'Pas d\'image']));
+        return new JsonResponse(['fail' => 'Pas d\'image']);
     }
 
     /**
      * @Route("/api/user/{id}/close", name="close_user", methods={"GET"})
      */
-    public function apiClosePosts(User $user = null, PostRepository $postRepository, SerializerInterface $serializer)
+    public function apiClosePosts(User $user = null, PostRepository $postRepository, SerializerInterface $serializer, UserInterface $userInterface, UserRepository $userRepository)
     {
         if (!$user) {
             throw $this->createNotFoundException(
                 'User not found'
             );
+        }
+
+        if (!$this->apiIsSameUser($user, $userInterface, $userRepository) && !$this->apiIsAdmin($userInterface, $userRepository)) {
+            throw $this->createAccessDeniedException();
         }
         
         $lat = $user->getLat();
