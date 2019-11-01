@@ -17,6 +17,8 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -24,6 +26,31 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class PostController extends AbstractController
 {
+    private function apiIsSameUser(Post $post, UserInterface $userInterface, UserRepository $userRepository)
+    {
+        $postUser = $post->getUser();
+        $currentUser = $userRepository->findOneByUsername($userInterface->getUsername());
+        
+        if ($currentUser !== $postUser) {
+            return false;
+        } else {
+            return true;
+          }
+    }
+
+    private function apiIsAdmin(UserInterface $userInterface, UserRepository $userRepository)
+    {
+        $currentUser = $userRepository->findOneByUsername($userInterface->getUsername());
+        
+        $roles = $currentUser->getRoles();
+
+        if (is_array($roles) && in_array('ROLE_ADMIN', $roles)) {
+          return true;
+        } else {
+          return false;
+        }
+    }
+
     /**
      * @Route("/posts", name="get_posts", methods={"GET"})
      */
@@ -61,11 +88,14 @@ class PostController extends AbstractController
      */
     public function apiCreatePost(Request $request, SerializerInterface $serializer, UserRepository $userRepository, 
     PostStatusRepository $postStatusRepository, VisibilityRepository $visibilityRepository, WearConditionRepository $wearConditionRepository, 
-    CategoryRepository $categoryRepository, ValidatorInterface $validator)
+    CategoryRepository $categoryRepository, ValidatorInterface $validator, UserInterface $userInterface)
     {
         $jsonData = $request->getContent();
 
         $post = $serializer->deserialize($jsonData, Post::class, 'json');
+
+        $user = $userRepository->findOneByUsername($userInterface->getUsername());
+        $post->setUser($user);
 
         $errors = $validator->validate($post);
 
@@ -81,14 +111,11 @@ class PostController extends AbstractController
 
         $parsed_json = json_decode($jsonData);
 
-        $userId = $parsed_json->{'user'}->{'id'};
         $postStatusId = $parsed_json->{'postStatus'}->{'id'};
         $visibilityId = $parsed_json->{'visibility'}->{'id'};
         $wearConditionId = $parsed_json->{'wearCondition'}->{'id'};
         $categoryId = $parsed_json->{'category'}->{'id'};
 
-        $user = $userRepository->find($userId);
-        $post->setUser($user);
         $postStatus = $postStatusRepository->find($postStatusId);
         $post->setPostStatus($postStatus);
         $visibility = $visibilityRepository->find($visibilityId);
@@ -103,7 +130,7 @@ class PostController extends AbstractController
         $entityManager->persist($post);
         $entityManager->flush();
 
-        return new Response(json_encode(['success' => 'Le post a été créé']));
+        return new JsonResponse(['success' => 'Le post a été créé']);
     }
 
     /**
@@ -111,12 +138,17 @@ class PostController extends AbstractController
      */
     public function apiEditPost(Request $request, Post $post = null, SerializerInterface $serializer, 
     PostStatusRepository $postStatusRepository, VisibilityRepository $visibilityRepository, 
-    WearConditionRepository $wearConditionRepository, CategoryRepository $categoryRepository, ValidatorInterface $validator)
+    WearConditionRepository $wearConditionRepository, CategoryRepository $categoryRepository, ValidatorInterface $validator, 
+    UserInterface $userInterface, UserRepository $userRepository)
     {
         if (!$post) {
             throw $this->createNotFoundException(
                 'Post not found'
             );
+        }
+
+        if (!$this->apiIsSameUser($post, $userInterface, $userRepository) && !$this->apiIsAdmin($userInterface, $userRepository)) {
+            throw $this->createAccessDeniedException();
         }
 
         $jsonData = $request->getContent();
@@ -166,18 +198,22 @@ class PostController extends AbstractController
         $entityManager->merge($post);
         $entityManager->flush();
 
-        return new Response(json_encode(['success' => 'Le post a été modifié']));
+        return new JsonResponse(['success' => 'Le post a été modifié']);
     }
 
     /**
      * @Route("/post/{id}/new-picture", name="new_picture_post", methods={"GET","POST"})
      */
-    public function apiNewPicturePost(Request $request, Post $post = null)
+    public function apiNewPicturePost(Request $request, Post $post = null, UserInterface $userInterface, UserRepository $userRepository)
     {
         if (!$post) {
             throw $this->createNotFoundException(
                 'Post not found'
             );
+        }
+
+        if (!$this->apiIsSameUser($post, $userInterface, $userRepository) && !$this->apiIsAdmin($userInterface, $userRepository)) {
+            throw $this->createAccessDeniedException();
         }
 
         /** @var UploadedFile $picture */
@@ -198,20 +234,20 @@ class PostController extends AbstractController
                 $entityManager->merge($post);
                 $entityManager->flush(); 
 
-                return new Response(json_encode(['success' => 'L\'image est stockée']));
+                return new JsonResponse(['success' => 'L\'image est stockée']);
 
             } catch (FileException $e) {
                 // ... handle exception if something happens during file uploadf8f3577217a7fb6b58745689a06a1405
             }
         }
 
-        return new Response(json_encode(['fail' => 'Pas d\'image']));
+        return new JsonResponse(['fail' => 'Pas d\'image']);
     }
 
     /**
      * @Route("/post/{id}", name="delete_post", methods={"DELETE"})
      */
-    public function apiDeletePost(Post $post = null)
+    public function apiDeletePost(Post $post = null, UserInterface $userInterface, UserRepository $userRepository)
     {
         if (!$post) {
             throw $this->createNotFoundException(
@@ -219,11 +255,15 @@ class PostController extends AbstractController
             );
         }
 
+        if (!$this->apiIsSameUser($post, $userInterface, $userRepository) && !$this->apiIsAdmin($userInterface, $userRepository)) {
+            throw $this->createAccessDeniedException();
+        }
+
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->remove($post);
         $entityManager->flush();
 
-        return new Response(json_encode(['success' => 'Le post a été supprimé']));
+        return new JsonResponse(['success' => 'Le post a été supprimé']);
     }
 
     /**
@@ -264,7 +304,7 @@ class PostController extends AbstractController
         $entityManager->persist($commentary);
         $entityManager->flush();
 
-        return new Response(json_encode(['success' => 'Le commentaire a été créé']));
+        return new JsonResponse(['success' => 'Le commentaire a été créé']);
     }
 
     /**
