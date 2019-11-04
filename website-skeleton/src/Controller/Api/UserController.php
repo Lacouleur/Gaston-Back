@@ -5,6 +5,7 @@ namespace App\Controller\Api;
 use App\Entity\User;
 use App\Repository\PostRepository;
 use App\Repository\UserRepository;
+use Intervention\Image\ImageManagerStatic as Image;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -117,7 +118,7 @@ class UserController extends AbstractController
         $entityManager->persist($user);
         $entityManager->flush();
 
-        return new JsonResponse(['success' => 'L\'utilisateur a été créé']);
+        return new JsonResponse(['success' => 'The user has been created']);
     }
 
     /**
@@ -131,7 +132,7 @@ class UserController extends AbstractController
             );
         }
 
-        if (!$this->apiIsSameUser($user, $userInterface, $userRepository) && !$this->apiIsAdmin($userInterface, $userRepository)) {
+        if (!$this->apiIsSameUser($user, $userInterface, $userRepository)) {
             throw $this->createAccessDeniedException();
         }
 
@@ -174,7 +175,7 @@ class UserController extends AbstractController
         $entityManager->merge($user);
         $entityManager->flush();
 
-        return new JsonResponse(['success' => 'L\'utilisateur a été modifié']);
+        return new JsonResponse(['success' => 'The user has been modified']);
     }
 
     /**
@@ -188,7 +189,7 @@ class UserController extends AbstractController
             );
         }
 
-        if (!$this->apiIsSameUser($user, $userInterface, $userRepository) && !$this->apiIsAdmin($userInterface, $userRepository)) {
+        if (!$this->apiIsSameUser($user, $userInterface, $userRepository)) {
             throw $this->createAccessDeniedException();
         }
 
@@ -196,7 +197,9 @@ class UserController extends AbstractController
         $picture = $request->files->get('image');
 
         if ($picture) {
-            $filename = pathinfo($picture->getClientOriginalName(), PATHINFO_FILENAME);
+            $file = pathinfo($picture->getClientOriginalName());
+
+            $filename = 'user_' . $user->getId() . '.' . $file['extension'];
 
             try {
                 $picture->move(
@@ -204,20 +207,26 @@ class UserController extends AbstractController
                     $filename
                 );
 
-            $user->setPicture($filename);
+                $picture = Image::make($this->getParameter('pictures_directory') . '/' . $filename)
+                    ->resize(500, 500, function ($constraint) {
+                        $constraint->aspectRatio();
+                    })
+                    ->save($this->getParameter('pictures_directory') . '/' . $filename);
 
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->merge($user);
-            $entityManager->flush();
+                $user->setPicture($filename);
 
-            return new JsonResponse(['success' => 'L\'image est stockée']);
+                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager->merge($user);
+                $entityManager->flush();
+
+                return new JsonResponse(['success' => 'The picture has been saved']);
 
             } catch (FileException $e) {
                 // ... handle exception if something happens during file upload
             }
         }
 
-        return new JsonResponse(['fail' => 'Pas d\'image']);
+        return new JsonResponse(['fail' => 'Picture not found']);
     }
 
     /**
@@ -246,5 +255,4 @@ class UserController extends AbstractController
 
         return new Response($jsonData);
     }
-
 }
