@@ -17,10 +17,13 @@ easy_admin:
     entities:
         User:
           class: App\Entity\User
+          disabled_actions: ['edit']
         Post:
           class: App\Entity\Post
+          disabled_actions: ['edit']
         Commentary:
           class: App\Entity\Commentary
+          disabled_actions: ['edit']
         PostStatus:
           class: App\Entity\PostStatus
           disabled_actions: ['delete']
