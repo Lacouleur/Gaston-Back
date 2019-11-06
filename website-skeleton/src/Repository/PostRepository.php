@@ -38,7 +38,7 @@ class PostRepository extends ServiceEntityRepository
                     )
                 ) AS distance
             FROM post
-            HAVING distance < 1000
+            HAVING distance < 100
             ORDER BY distance'
         ;
         $stmt = $conn->prepare($sql);
