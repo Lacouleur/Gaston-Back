@@ -4,7 +4,9 @@ namespace App\Controller\Api;
 
 use App\Repository\PostRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -14,7 +16,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 class MapController extends AbstractController
 {
     /**
-     * @Route("/map", name="map")
+     * @Route("/map", name="map", methods={"GET","POST"})
      */
     public function map(Request $request, PostRepository $postRepository, SerializerInterface $serializer)
     {
@@ -26,7 +28,7 @@ class MapController extends AbstractController
         $lat = $parsed_json->{'lat'};
         $lng = $parsed_json->{'lng'};
 
-        if ($zoom > 15) {
+        if ($zoom >= 15) {
             $closePosts = $postRepository->findAllClosePosts($lat, $lng);
 
             $jsonData = $serializer->serialize($closePosts, 'json', [
@@ -36,6 +38,6 @@ class MapController extends AbstractController
             return new Response($jsonData);
         }
 
-        return new Response();
+        return new JsonResponse(['fail' => 'Too much posts']);
     }
 }
