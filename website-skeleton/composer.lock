@@ -2629,6 +2629,7 @@
             ],
             "description": "A polyfill for getallheaders.",
             "time": "2019-03-08T08:55:37+00:00"
+
         },
         {
             "name": "sensio/framework-extra-bundle",
@@ -7148,6 +7149,7 @@
         },
         {
             "name": "symfony/maker-bundle",
+
             "version": "v1.14.2",
             "source": {
                 "type": "git",
@@ -7212,6 +7214,7 @@
                 "scaffold",
                 "scaffolding"
             ],
+
             "time": "2019-11-04T13:50:13+00:00"
         },
         {
