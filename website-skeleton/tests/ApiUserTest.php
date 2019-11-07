@@ -24,8 +24,8 @@ class ApiUserTest extends WebTestCase
           array(),
           array('CONTENT_TYPE' => 'application/json'),
           json_encode(array(
-            '_username' => $username,
-            '_password' => $password,
+            'username' => $username,
+            'password' => $password,
             ))
           );
       
@@ -72,11 +72,10 @@ class ApiUserTest extends WebTestCase
      */
     public function testGetPages($url)
     {
-        $client = $this->createAuthenticatedClient();
+        $client = $this->createAuthenticatedClient('admin', 'admin');
         $client->request('GET', $url);
 
-        dd($client->getResponse()->getStatusCode());
-        $this->assertEquals(401, $client->getResponse()->getStatusCode());
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
         // ... 
     }
 
