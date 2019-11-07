@@ -133,7 +133,7 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/api/user/{id}/edit", name="edit_user", methods={"GET","PUT"})
+     * @Route("/api/user/{id}/edit", name="edit_user", methods={"GET","POST"})
      */
     public function apiEditUser(Request $request, User $user = null, SerializerInterface $serializer, ValidatorInterface $validator, UserInterface $userInterface, UserRepository $userRepository)
     {
@@ -206,7 +206,7 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/user/{id}", name="delete_user", methods={"DELETE"})
+     * @Route("/api/user/{id}", name="delete_user", methods={"DELETE"})
      */
     public function apiDeleteUser(User $user = null, UserInterface $userInterface, UserRepository $userRepository)
     {
