@@ -5,17 +5,13 @@ namespace App\Controller\Api;
 use App\Entity\Post;
 use App\Entity\Commentary;
 use App\Repository\CategoryRepository;
-use App\Repository\PostRepository;
-use App\Repository\PostStatusRepository;
 use App\Repository\UserRepository;
-use App\Repository\VisibilityRepository;
-use App\Repository\WearConditionRepository;
+use Intervention\Image\ImageManagerStatic as Image;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -51,18 +47,32 @@ class PostController extends AbstractController
         }
     }
 
-    /**
-     * @Route("/posts", name="get_posts", methods={"GET"})
-     */
-    public function apiGetPosts(PostRepository $postRepository, SerializerInterface $serializer)
+    private function apiAddPicture(Request $request, Post $post)
     {
-        $posts = $postRepository->findAll();
+        /** @var UploadedFile $picture */
+        $picture = $request->files->get('image');
+        
+        if ($picture) {
+            $file = pathinfo($picture->getClientOriginalName());
+            $filename = 'post_' . $post->getId() . '.' . $file['extension'];
 
-        $jsonData = $serializer->serialize($posts, 'json', [
-            'groups' => 'post_get',
-        ]);
+            $picture->move(
+                $this->getParameter('pictures_directory'),
+            $filename
+            );
 
-        return new Response($jsonData);
+            $picture = Image::make($this->getParameter('pictures_directory') . '/' . $filename)
+                ->resize(500, 500, function ($constraint) {
+                    $constraint->aspectRatio();
+                })
+                ->save($this->getParameter('pictures_directory') . '/' . $filename);
+
+            $post->setPicture($filename);
+        }
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->merge($post);
+        $entityManager->flush();
     }
 
     /**
@@ -86,16 +96,30 @@ class PostController extends AbstractController
     /**
      * @Route("/post-new", name="create_post", methods={"POST"})
      */
-    public function apiCreatePost(Request $request, SerializerInterface $serializer, UserRepository $userRepository, 
-    PostStatusRepository $postStatusRepository, VisibilityRepository $visibilityRepository, WearConditionRepository $wearConditionRepository, 
+    public function apiCreatePost(Request $request, UserRepository $userRepository, 
     CategoryRepository $categoryRepository, ValidatorInterface $validator, UserInterface $userInterface)
     {
-        $jsonData = $request->getContent();
+        $data = $request->request;
 
-        $post = $serializer->deserialize($jsonData, Post::class, 'json');
+        $categoryLabel = $data->get('category');
+        $title = $data->get('title');
+        $description = $data->get('description');
+        $addressLabel = $data->get('addressLabel');
+        $lat = floatval($data->get('lat'));
+        $lng = floatval($data->get('lng'));
 
+        $category = $categoryRepository->findOneByLabel($categoryLabel);
         $user = $userRepository->findOneByUsername($userInterface->getUsername());
+
+        $post = new Post;
+        
+        $post->setCategory($category);
         $post->setUser($user);
+        $post->setTitle($title);
+        $post->setDescription($description);
+        $post->setAddressLabel($addressLabel);
+        $post->setLat($lat);
+        $post->setLng($lng);
 
         $errors = $validator->validate($post);
 
@@ -109,36 +133,19 @@ class PostController extends AbstractController
             return $this->json($jsonErrors, 422);
         }
 
-        $parsed_json = json_decode($jsonData);
-
-        $postStatusId = $parsed_json->{'postStatus'}->{'id'};
-        $visibilityId = $parsed_json->{'visibility'}->{'id'};
-        $wearConditionId = $parsed_json->{'wearCondition'}->{'id'};
-        $categoryId = $parsed_json->{'category'}->{'id'};
-
-        $postStatus = $postStatusRepository->find($postStatusId);
-        $post->setPostStatus($postStatus);
-        $visibility = $visibilityRepository->find($visibilityId);
-        $post->setVisibility($visibility);
-        $wearCondition = $wearConditionRepository->find($wearConditionId);
-        $post->setWearCondition($wearCondition);
-        $category = $categoryRepository->find($categoryId);
-        $post->setCategory($category);
-
-
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($post);
         $entityManager->flush();
+
+        $this->apiAddPicture($request, $post);
 
         return new JsonResponse(['success' => 'The post has been added']);
     }
 
     /**
-     * @Route("/post/{id}/edit", name="edit_post", methods={"GET","PUT"})
+     * @Route("/post/{id}/edit", name="edit_post", methods={"GET","POST"})
      */
-    public function apiEditPost(Request $request, Post $post = null, SerializerInterface $serializer, 
-    PostStatusRepository $postStatusRepository, VisibilityRepository $visibilityRepository, 
-    WearConditionRepository $wearConditionRepository, CategoryRepository $categoryRepository, ValidatorInterface $validator, 
+    public function apiEditPost(Request $request, Post $post = null, CategoryRepository $categoryRepository, ValidatorInterface $validator, 
     UserInterface $userInterface, UserRepository $userRepository)
     {
         if (!$post) {
@@ -151,36 +158,30 @@ class PostController extends AbstractController
             throw $this->createAccessDeniedException();
         }
 
-        $jsonData = $request->getContent();
+        $data = $request->request;
 
-        $postUpdate = $serializer->deserialize($jsonData, Post::class, 'json');
+        $categoryLabel = $data->get('category');
+        $title = $data->get('title');
+        $description = $data->get('description');
+        $addressLabel = $data->get('addressLabel');
+        $lat = floatval($data->get('lat'));
+        $lng = floatval($data->get('lng'));
 
-        $parsed_json = json_decode($jsonData);
-
-        $postStatusId = $parsed_json->{'postStatus'}->{'id'};
-        $visibilityId = $parsed_json->{'visibility'}->{'id'};
-        $wearConditionId = $parsed_json->{'wearCondition'}->{'id'};
-        $categoryId = $parsed_json->{'category'}->{'id'};
-
-        $postStatus = $postStatusRepository->find($postStatusId);
-        $post->setPostStatus($postStatus);
-        $visibility = $visibilityRepository->find($visibilityId);
-        $post->setVisibility($visibility);
-        $wearCondition = $wearConditionRepository->find($wearConditionId);
-        $post->setWearCondition($wearCondition);
-        $category = $categoryRepository->find($categoryId);
-        $post->setCategory($category);
-
-        $postTitle = $postUpdate->getTitle();
-        $post->setTitle($postTitle);
-        $postDescription = $postUpdate->getDescription();
-        $post->setDescription($postDescription);
-        $postAddressLabel = $postUpdate->getAddressLabel();
-        $post->setAddressLabel($postAddressLabel);
-        $postLat = $postUpdate->getLat();
-        $post->setLat($postLat);
-        $postLng = $postUpdate->getLng();
-        $post->setLng($postLng);
+        if ($categoryLabel) {
+            $category = $categoryRepository->findOneByLabel($categoryLabel);
+            $post->setCategory($category);
+        }
+        if ($title) {
+            $post->setTitle($title);
+        }
+        if ($description) {
+            $post->setDescription($description);
+        }
+        if ($addressLabel) {
+            $post->setAddressLabel($addressLabel);
+            $post->setLat($lat);
+            $post->setLng($lng);
+        }
 
         $errors = $validator->validate($post);
 
@@ -198,50 +199,9 @@ class PostController extends AbstractController
         $entityManager->merge($post);
         $entityManager->flush();
 
+        $this->apiAddPicture($request, $post);
+
         return new JsonResponse(['success' => 'The post has been modified']);
-    }
-
-    /**
-     * @Route("/post/{id}/new-picture", name="new_picture_post", methods={"GET","POST"})
-     */
-    public function apiNewPicturePost(Request $request, Post $post = null, UserInterface $userInterface, UserRepository $userRepository)
-    {
-        if (!$post) {
-            throw $this->createNotFoundException(
-                'Post not found'
-            );
-        }
-
-        if (!$this->apiIsSameUser($post, $userInterface, $userRepository)) {
-            throw $this->createAccessDeniedException();
-        }
-
-        /** @var UploadedFile $picture */
-        $picture = $request->files->get('image');
-        
-        if ($picture) {
-            $filename = pathinfo($picture->getClientOriginalName(), PATHINFO_FILENAME);
-            try {
-
-                $picture->move(
-                    $this->getParameter('pictures_directory'),
-                    $filename
-                );
-                
-                $post->setPicture($filename);
-
-                $entityManager = $this->getDoctrine()->getManager();
-                $entityManager->merge($post);
-                $entityManager->flush(); 
-
-                return new JsonResponse(['success' => 'The picture has been saved']);
-
-            } catch (FileException $e) {
-                // ... handle exception if something happens during file uploadf8f3577217a7fb6b58745689a06a1405
-            }
-        }
-
-        return new JsonResponse(['fail' => 'Picture not found']);
     }
 
     /**
@@ -259,6 +219,10 @@ class PostController extends AbstractController
             throw $this->createAccessDeniedException();
         }
 
+        if ($post->getPicture()) {
+            unlink($this->getParameter('pictures_directory') . '/' . $post->getPicture());
+        }
+        
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->remove($post);
         $entityManager->flush();
@@ -303,28 +267,5 @@ class PostController extends AbstractController
         $entityManager->flush();
 
         return new JsonResponse(['success' => 'The commentary has been added']);
-    }
-
-    /**
-     * @Route("/post/{id}/close", name="close_post", methods={"GET"})
-     */
-    public function apiClosePosts(Post $post = null, PostRepository $postRepository, SerializerInterface $serializer)
-    {
-        if (!$post) {
-            throw $this->createNotFoundException(
-                'Post not found'
-            );
-        }
-        
-        $lat = $post->getLat();
-        $lng = $post->getLng();
-
-        $closePosts = $postRepository->findAllClosePosts($lat, $lng);
-
-        $jsonData = $serializer->serialize($closePosts, 'json', [
-            'groups' => 'post_get',
-        ]);
-
-        return new Response($jsonData);
     }
 }

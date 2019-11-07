@@ -1,8 +1,19 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Log in!{% endblock %}
+
+{% block title %}Se connecter{% endblock %}
+
 
 {% block body %}
+<style>
+.body-style { margin-top: 100px; background: rgb(255, 250, 248); padding: 2px 6px; text-align:center; }
+.body-title { margin: 1em auto; font: 25px/1.5 sans-serif; text-align: center;}
+.div-username { margin: 1em auto; width: 30%; align: center;}
+.div-password { margin: 1em auto; width: 30%; align: center;}
+.btn { margin: 1em auto; width: 15%; align: center; border-width: 2px ; border-radius: 15px; border-color: rgb(90, 194, 255); background-color: rgb(255, 250, 248); color: black;}
+.form-control { border-radius: 15px;}
+img { width: 200px; height: 200px;}
+</style>
 <form method="post">
     {% if error %}
         <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
@@ -13,16 +24,27 @@
             You are logged in as {{ app.user.username }}, <a href="{{ path('app_logout') }}">Logout</a>
         </div>
     {% endif %}
-
-    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+    <body class="body-style">
+    <img src=" {{ asset ( 'uploads/pictures/logo-black.png' ) }} " alt="logo">
+    
+    <h1 class="body-title">Se connecter:</h1>
+    <div class="div-username">
     <label for="inputUsername" class="sr-only">Username</label>
-    <input type="text" value="{{ last_username }}" name="username" id="inputUsername" class="form-control" placeholder="Username" required autofocus>
+    <input type="text" value="{{ last_username }}" name="username" id="inputUsername" class="form-control" placeholder="Nom d'utilisateur" required autofocus>
+    </div>
+    <div class="div-password">
     <label for="inputPassword" class="sr-only">Password</label>
-    <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required>
+    <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Mot de passe" required>
+    </div>
 
     <input type="hidden" name="_csrf_token"
            value="{{ csrf_token('authenticate') }}"
     >
+    <button class="btn" type="submit">
+            Valider
+    </button>
+    
+    </body>
 
     {#
         Uncomment this section and add a remember_me option below your firewall to activate remember me functionality.
@@ -35,8 +57,6 @@
         </div>
     #}
 
-    <button class="btn btn-lg btn-primary" type="submit">
-        Sign in
-    </button>
+   
 </form>
 {% endblock %}

@@ -123,5 +123,4 @@ class CommentaryController extends AbstractController
 
         return new JsonResponse(['success' => 'The commentary has been deleted']);
     }
-
 }

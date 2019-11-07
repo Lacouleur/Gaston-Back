@@ -69,28 +69,28 @@ class FakerFixtures extends Fixture
         ));
 
         // Post-Status
-        $populator->addEntity('App\Entity\PostStatus', 3, array(
+        $populator->addEntity('App\Entity\PostStatus', 2, array(
             'label' => function () use ($generator) {
                 return $generator->word();
             },
         ));
 
         // Visibilities
-        $populator->addEntity('App\Entity\Visibility', 3, array(
+        $populator->addEntity('App\Entity\Visibility', 1, array(
             'label' => function () use ($generator) {
                 return $generator->word();
             },
         ));
 
         // Categories
-        $populator->addEntity('App\Entity\Category', 5, array(
+        $populator->addEntity('App\Entity\Category', 4, array(
             'label' => function () use ($generator) {
                 return $generator->word();
             },
         ));
 
         // Wear-Conditions
-        $populator->addEntity('App\Entity\WearCondition', 3, array(
+        $populator->addEntity('App\Entity\WearCondition', 1, array(
             'label' => function () use ($generator) {
                 return $generator->word();
             },

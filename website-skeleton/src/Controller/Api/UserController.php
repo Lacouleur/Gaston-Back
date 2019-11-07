@@ -3,15 +3,14 @@
 namespace App\Controller\Api;
 
 use App\Entity\User;
-use App\Repository\PostRepository;
 use App\Repository\UserRepository;
+use Intervention\Image\ImageManagerStatic as Image;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -46,21 +45,34 @@ class UserController extends AbstractController
         }
     }
 
-    /**
-     * @Route("/api/users", name="get_users", methods={"GET"})
-     */
-    public function apiGetUsers(UserRepository $userRepository, SerializerInterface $serializer)
+    private function apiAddPicture(Request $request, User $user)
     {
-        $users = $userRepository->findAll();
+        /** @var UploadedFile $picture */
+        $picture = $request->files->get('image');
         
-        $jsonData = $serializer->serialize($users, 'json', [
-            'groups' => 'user_get',
-        ]);
+        if ($picture) {
+            $file = pathinfo($picture->getClientOriginalName());
+            $filename = 'user_' . $user->getId() . '.' . $file['extension'];
 
+            $picture->move(
+                $this->getParameter('pictures_directory'),
+            $filename
+            );
 
-        return new Response($jsonData);
+            $picture = Image::make($this->getParameter('pictures_directory') . '/' . $filename)
+                ->resize(500, 500, function ($constraint) {
+                    $constraint->aspectRatio();
+                })
+                ->save($this->getParameter('pictures_directory') . '/' . $filename);
+
+            $user->setPicture('http://alexis-le-trionnaire.vpnuser.lan/projet-Gaston/website-skeleton/public/uploads/pictures/' . $filename);
+        }
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->merge($user);
+        $entityManager->flush();
     }
-    
+
     /**
      * @Route("/api/user/{id}", name="get_user", methods={"GET"})
      */
@@ -121,7 +133,7 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/api/user/{id}/edit", name="edit_user", methods={"GET","PUT"})
+     * @Route("/api/user/{id}/edit", name="edit_user", methods={"GET","POST"})
      */
     public function apiEditUser(Request $request, User $user = null, SerializerInterface $serializer, ValidatorInterface $validator, UserInterface $userInterface, UserRepository $userRepository)
     {
@@ -135,28 +147,42 @@ class UserController extends AbstractController
             throw $this->createAccessDeniedException();
         }
 
-        $jsonData = $request->getContent();
+        $data = $request->request;
 
-        $userUpdate = $serializer->deserialize($jsonData, User::class, 'json');
+    
+        $email = $data->get('email');
+        $firstname = $data->get('firstname');
+        $lastname = $data->get('lastname');
+        $phoneNumber = $data->get('phoneNumber');
+        $organisation = $data->get('organisation');
+        $description = $data->get('description');
+        $addressLabel = $data->get('addressLabel');;
+        $lat = $data->get('lat');
+        $lng = $data->get('lng');
 
-        $userEmail = $userUpdate->getEmail();
-        $user->setEmail($userEmail);
-        $userFirstname = $userUpdate->getFirstname();
-        $user->setFirstname($userFirstname);
-        $userLastname = $userUpdate->getLastname();
-        $user->setLastname($userLastname);
-        $userPhoneNumber = $userUpdate->getPhoneNumber();
-        $user->setPhoneNumber($userPhoneNumber);
-        $userOrganisation = $userUpdate->getOrganisation();
-        $user->setOrganisation($userOrganisation);
-        $userDescription = $userUpdate->getDescription();
-        $user->setDescription($userDescription);
-        $userAddressLabel = $userUpdate->getAddressLabel();
-        $user->setAddressLabel($userAddressLabel);
-        $userLat = $userUpdate->getLat();
-        $user->setLat($userLat);
-        $userLng = $userUpdate->getLng();
-        $user->setLng($userLng);
+        if ($email) {
+            $user->setEmail($email);
+        }
+        if ($firstname) {
+            $user->setFirstname($firstname);
+        }
+        if ($lastname) {
+            $user->setLastname($lastname);
+        }
+        if ($phoneNumber) {
+            $user->setPhoneNumber($phoneNumber);
+        }
+        if ($organisation) {
+            $user->setOrganisation($organisation);
+        }
+        if ($description) {
+            $user->setDescription($description);
+        }
+        if ($addressLabel) {
+            $user->setAddressLabel($addressLabel);
+            $user->setLat($lat);
+            $user->setLng($lng);
+        }
 
         $errors = $validator->validate($user);
 
@@ -174,56 +200,15 @@ class UserController extends AbstractController
         $entityManager->merge($user);
         $entityManager->flush();
 
+        $this->apiAddPicture($request, $user);
+
         return new JsonResponse(['success' => 'The user has been modified']);
     }
 
     /**
-     * @Route("/api/user/{id}/new-picture", name="new_picture__user", methods={"GET","POST"})
+     * @Route("/api/user/{id}", name="delete_user", methods={"DELETE"})
      */
-    public function apiNewPictureUser(Request $request, User $user = null, UserInterface $userInterface, UserRepository $userRepository)
-    {
-        if (!$user) {
-            throw $this->createNotFoundException(
-                'User not found'
-            );
-        }
-
-        if (!$this->apiIsSameUser($user, $userInterface, $userRepository)) {
-            throw $this->createAccessDeniedException();
-        }
-
-        /** @var UploadedFile $picture */
-        $picture = $request->files->get('image');
-
-        if ($picture) {
-            $filename = pathinfo($picture->getClientOriginalName(), PATHINFO_FILENAME);
-
-            try {
-                $picture->move(
-                    $this->getParameter('pictures_directory'),
-                    $filename
-                );
-
-            $user->setPicture($filename);
-
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->merge($user);
-            $entityManager->flush();
-
-            return new JsonResponse(['success' => 'The picture has been saved']);
-
-            } catch (FileException $e) {
-                // ... handle exception if something happens during file upload
-            }
-        }
-
-        return new JsonResponse(['fail' => 'Picture not found']);
-    }
-
-    /**
-     * @Route("/api/user/{id}/close", name="close_user", methods={"GET"})
-     */
-    public function apiClosePosts(User $user = null, PostRepository $postRepository, SerializerInterface $serializer, UserInterface $userInterface, UserRepository $userRepository)
+    public function apiDeleteUser(User $user = null, UserInterface $userInterface, UserRepository $userRepository)
     {
         if (!$user) {
             throw $this->createNotFoundException(
@@ -234,17 +219,15 @@ class UserController extends AbstractController
         if (!$this->apiIsSameUser($user, $userInterface, $userRepository) && !$this->apiIsAdmin($userInterface, $userRepository)) {
             throw $this->createAccessDeniedException();
         }
+
+        if ($user->getPicture()) {
+            unlink($this->getParameter('pictures_directory') . '/' . $user->getPicture());
+        }
         
-        $lat = $user->getLat();
-        $lng = $user->getLng();
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->remove($user);
+        $entityManager->flush();
 
-        $closePosts = $postRepository->findAllClosePosts($lat, $lng);
-
-        $jsonData = $serializer->serialize($closePosts, 'json', [
-            'groups' => 'post_get',
-        ]);
-
-        return new Response($jsonData);
+        return new JsonResponse(['success' => 'The user has been deleted']);
     }
-
 }

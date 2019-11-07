@@ -96,21 +96,18 @@ class Post
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\PostStatus", inversedBy="posts")
-     * @ORM\JoinColumn(nullable=false)
      * @Groups("post_get")
      */
     private $postStatus;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Visibility", inversedBy="posts")
-     * @ORM\JoinColumn(nullable=false)
      * @Groups("post_get")
      */
     private $visibility;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\WearCondition", inversedBy="posts")
-     * @ORM\JoinColumn(nullable=false)
      * @Groups("post_get")
      */
     private $wearCondition;
@@ -350,5 +347,5 @@ class Post
 
         return $this;
     }
-
+    
 }
