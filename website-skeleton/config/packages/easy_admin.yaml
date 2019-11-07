@@ -20,7 +20,8 @@ easy_admin:
           disabled_actions: ['edit']
         Post:
           class: App\Entity\Post
-          disabled_actions: ['edit']
+          form:
+            fields : ['category']
         Commentary:
           class: App\Entity\Commentary
           disabled_actions: ['edit']
