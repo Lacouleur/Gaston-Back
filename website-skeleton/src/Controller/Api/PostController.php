@@ -96,7 +96,7 @@ class PostController extends AbstractController
     /**
      * @Route("/post-new", name="create_post", methods={"POST"})
      */
-    public function apiCreatePost(Request $request, UserRepository $userRepository, 
+    public function apiCreatePost(Request $request, UserRepository $userRepository, SerializerInterface $serializer, 
     CategoryRepository $categoryRepository, ValidatorInterface $validator, UserInterface $userInterface)
     {
         $data = $request->request;
@@ -139,7 +139,11 @@ class PostController extends AbstractController
 
         $this->apiAddPicture($request, $post);
 
-        return new JsonResponse($post);
+        $jsonData = $serializer->serialize($post, 'json', [
+            'groups' => 'post_get',
+        ]);
+
+        return new Response($jsonData);
     }
 
     /**
