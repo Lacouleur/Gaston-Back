@@ -18,7 +18,6 @@ class Visibility
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups("post_get")
      * @Groups("visibility_get")
      */
     private $id;

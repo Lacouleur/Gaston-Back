@@ -18,7 +18,6 @@ class PostStatus
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups("post_get")
      * @Groups("postStatus_get")
      */
     private $id;

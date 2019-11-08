@@ -30,6 +30,7 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=64)
      * @Groups("user_get")
+     * @Groups("post_get")
      * @Assert\NotBlank
      * @Assert\Length(min=4)
      */

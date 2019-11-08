@@ -96,19 +96,17 @@ class Post
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\PostStatus", inversedBy="posts")
-     * @Groups("post_get")
+     * @ORM\JoinColumn(nullable=true)
      */
     private $postStatus;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Visibility", inversedBy="posts")
-     * @Groups("post_get")
      */
     private $visibility;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\WearCondition", inversedBy="posts")
-     * @Groups("post_get")
      */
     private $wearCondition;
 
@@ -121,7 +119,6 @@ class Post
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Commentary", mappedBy="post", orphanRemoval=true)
-     * @Groups("post_get")
      */
     private $commentaries;
 

@@ -15,7 +15,6 @@ class Commentary
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups("post_get")
      * @Groups("commentary_get")
      */
     private $id;

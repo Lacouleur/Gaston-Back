@@ -139,7 +139,7 @@ class PostController extends AbstractController
 
         $this->apiAddPicture($request, $post);
 
-        return new JsonResponse(['success' => 'The post has been added']);
+        return new JsonResponse($post);
     }
 
     /**

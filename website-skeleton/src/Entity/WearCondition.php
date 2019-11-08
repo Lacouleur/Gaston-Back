@@ -18,7 +18,6 @@ class WearCondition
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups("post_get")
      * @Groups("wearCondition_get")
      */
     private $id;
