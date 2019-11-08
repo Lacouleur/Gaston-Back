@@ -1,0 +1,92 @@
+@import 'src/styles/vars';
+
+b {
+  font-weight: $medium;
+}
+
+.inscription {
+  width: 100%;
+
+  &-form {
+    &-input {
+      margin: auto;
+      width: 70%;
+      text-align: center;
+      height: 2.5em;
+      margin-bottom: 3%;
+      @extend .field;
+      border-color: $cat-event-color;
+      cursor: pointer;
+    }
+    &--citysearch {
+      border-color: none;
+      margin: auto;
+      width: 70%;
+      text-align: center;
+      margin-top: -0.2em;
+      margin-bottom: 0.4em;
+    }
+  }
+  &-text {
+    width: 100%;
+    font-family: $typo;
+    font-size: $regular;
+    font-style: italic;
+    color: $black-text-color;
+    padding: 0 2em 0 2em;
+    line-height: 1.5em;
+    margin-bottom: 2em;
+    text-align: center;
+
+    &-link {
+      color: $add-button-color;
+      cursor: pointer;
+      display: block;
+      font-size: 0.8em;
+      margin: 2em 0;
+      text-align: center;
+      text-decoration: underline;
+
+      &:hover {
+        opacity: 0.8;
+        cursor: pointer;
+      }
+    }
+  }
+
+  &-logo {
+    @extend .logo;
+  }
+
+  &-subTitle {
+    font-size: 1.5em;
+    //text-transform : uppercase;
+    font-weight: $medium;
+    text-align: center;
+    color: $dark-grey-text-color;
+    margin-bottom: 6%;
+  }
+
+  &-retour {
+    margin: auto;
+    margin-top: 3%;
+    @extend .button--add;
+    cursor: pointer;
+  }
+
+  &-form-submit {
+    margin: auto;
+    @extend .button--inscription;
+    cursor: pointer;
+  }
+
+  &-info-red {
+    color: $error-color;
+  }
+}
+
+.inscription-form--citysearch,
+li:hover {
+  color: darken($cat-event-color, 40%);
+  cursor: pointer;
+}

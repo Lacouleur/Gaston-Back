@@ -1,0 +1,19 @@
+@import 'src/styles/vars'; 
+
+.fields {
+       
+        &-input {
+            margin : auto;
+            width : 70%;
+            text-align: center;
+            height: 2.5em;
+            margin-bottom: 3%;
+            margin-top:2em;
+            @extend .field ;
+            border-color: $cat-treasure-color;
+            cursor: pointer;
+
+            }
+    
+
+} 

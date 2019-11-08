@@ -1,0 +1,86 @@
+@import 'src/styles/vars'; 
+
+b {
+    font-weight: $medium;
+  }
+
+.login {
+    
+    width : 100%;
+    &-form {
+
+        &-input {
+            margin : auto;
+            width : 70%;
+            text-align: center;
+            font-size: 1em!important;
+            height: 2.5em;
+            margin-bottom: 2em;
+                @extend .field ;
+                cursor: pointer;
+    
+        }
+    }
+   
+
+    &-text {
+        width: 100%;
+        font-family: $typo;
+        font-size: 1em!important;;
+        font-style: italic;
+        color : $black-text-color; 
+        padding : 0 2em 0 2em;
+        line-height : 1.5em;
+        margin-bottom: 3%;
+
+        &-link {
+            color: $add-button-color;
+            cursor: pointer;
+            display: block;
+            font-size: 0.8em;
+            margin: 2em 0;
+            text-align: center;
+            text-decoration: underline;
+        
+            &:hover {
+              opacity: .8;
+            }
+        }
+    }
+
+    &-info-red {
+        color : $error-color;
+        font-size: 0.7em;
+        margin-bottom: 1em;
+        margin-top:1em;
+        text-align: center;
+    }
+
+    &-logo {
+        @extend .logo ;
+    }
+
+    &-subTitle {
+        font-size: 1.5em;
+        //text-transform : uppercase;
+        font-weight: $medium;
+        text-align : center;
+        color : $dark-grey-text-color;
+        margin-top : 2em;
+        margin-bottom : 2em;
+    }
+
+    &-form-submit--login {
+        font-size: 1em!important;
+        margin : auto;
+        margin-bottom: 3%;
+            @extend .button--add ;
+
+    }
+    &-form-submit--inscription {
+        font-size: 1em!important;
+        margin: auto;
+        @extend .button--inscription ;
+    }
+
+}

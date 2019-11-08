@@ -1,0 +1,58 @@
+@import 'src/styles/vars'; 
+
+b {
+    font-weight: $medium;
+  }
+
+.welcome {
+
+    &-text {
+        font-family: $typo;
+        font-size: $regular;
+        color : $black-text-color; 
+        padding : 0 1.5em 0 1.5em;
+        line-height : 1.5em;
+
+        &-list {
+            margin-bottom : 0.8em;
+
+        }
+
+
+    }
+
+    &-logo {
+        @extend .logo ;
+    }
+
+    &-appTitle {
+        font-size: 2.5em;
+        //text-transform : uppercase;
+        font-weight: $bold;
+        text-align : center;
+    }
+
+    &-subTitle {
+        font-size: 1.5em;
+        //text-transform : uppercase;
+        font-weight: $medium;
+        text-align : center;
+        color : $dark-grey-text-color;
+        margin-top : 1em;
+        margin-bottom : 1em;
+    }
+
+    &-buttonStart {
+        margin : auto;
+        margin-top : 6%;
+        width : 70%;
+        padding : 1em;
+        font-size: 1em;
+        font-weight: $medium;
+        text-align: center;
+            @extend .button--add ;
+            cursor: pointer;
+
+    }
+
+}

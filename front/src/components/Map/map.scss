@@ -1,0 +1,54 @@
+@import 'src/styles/vars';
+// code {
+//   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+// }
+
+// .marker-btn {
+//   background: none;
+//   border: none;
+//   cursor: pointer;
+// }
+
+// .marker-btn img {
+//   width: 20px;
+//   height: 20px;
+// }
+
+.float_center {
+  float: left;
+  position: relative;
+  top: -46vh;
+  right: -31.5vw;
+  text-align: left;
+}
+
+.popup-content {
+  h2 {
+    font-size: $typo-size;
+    color: $title;
+    font-weight: $semi-bold;
+    padding-bottom: $small-gutter;
+  }
+}
+img.popup-content {
+  width: 30%;
+  height: 30%;
+}
+
+.tresor {
+  flex-shrink: 0;
+  margin: 20px;
+  height: calc(150px + 6vw);
+  width: calc(150px + 6vw);
+  border: calc(8px + 0.2vw) solid transparent;
+  background-origin: border-box;
+  background-clip: content-box, border-box;
+  background-size: cover;
+  box-sizing: border-box;
+  box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.5);
+}
+.dons {
+  border-radius: 50%;
+  background-image: var(--img-url),
+    linear-gradient(to bottom right, #ff3cac, #562b7c, #2b86c5);
+}

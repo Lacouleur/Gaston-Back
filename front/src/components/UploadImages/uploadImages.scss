@@ -1,0 +1,94 @@
+@import 'src/styles/vars'; 
+//Image Uploader 
+
+.uploader {
+
+    width: 100%;
+    margin: 1em auto;
+    display: flex;
+    flex-direction: column;
+  
+  
+    &-field {
+  
+    }
+  
+    &-clear {
+        @extend .button ;
+        border-color: $medium-grey-text-color;
+        font-weight: $medium;
+        font-size: 0.8em;
+        width : 30%;
+        margin : auto;
+        margin-top: 0.5em;
+        margin-bottom: 1em;
+      
+  
+    }
+  
+    &-preview-container{
+        width: 100%;
+        margin : auto;
+    }
+  
+    &-upload-container{
+      cursor: pointer;
+      width: 50%;
+      margin : auto;
+  
+    }
+  
+    &-render-preview {
+        width: 100%;
+        margin : auto;
+    }
+  
+    &-image-container {
+        width: 60%;
+        margin : auto;
+    }
+  
+    &-details {
+        font-size : 0.5em;
+        text-align : center; 
+  
+    }
+  
+    &-placeholder-preview {
+        width: 60%;
+        margin : auto;
+      background-color: $light-grey-text-color;
+      cursor: pointer;
+  
+    } 
+  
+    &-has-error {
+        color : $error-color;
+        text-align: center;
+        
+  
+    }
+  
+    &-error {
+        color : $error-color;
+        text-align: center;
+  
+    }
+    &-desc {
+      font-size: $typo-size-Small;
+      text-align: center;
+      line-height: 0.2em;
+    }
+  
+    &-icon {
+      width : 50%;
+      margin : 25%;
+      font-size: 100;
+    }
+  
+  }
+  
+  .clear {
+    clear: both;
+  }
+  

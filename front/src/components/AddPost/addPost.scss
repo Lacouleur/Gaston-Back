@@ -1,0 +1,90 @@
+@import 'src/styles/vars'; 
+
+
+.container {
+    height: 100%;
+    width: 100%;
+    position: relative;
+    border: 3px solid green; 
+}
+
+.addPost {
+
+    margin: 0;
+    width : 70%;
+    text-align : center; 
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+
+
+    &-title {
+
+
+       
+    }
+
+    &-desc {
+        margin-bottom : 2%;
+        margin-top : 6%;
+        font-size: 0.8em;
+    }
+
+    &-don {
+        @extend .button ; 
+        text-transform: uppercase;
+        font-weight: $medium;
+        font-size : 1em; 
+        width : 50%;
+        min-width : 90px;
+        margin : auto; 
+        border-color : #ffdb26;
+
+    }
+
+    &-tresor {
+        @extend .button ; 
+        text-transform: uppercase;
+        font-weight: $medium;
+        font-size : 1em; 
+        width : 50%;
+        min-width : 90px;
+        margin : auto; 
+        border-color :#ff4d4d ;
+
+    }
+
+    &-evenement {
+        @extend .button ; 
+        text-transform: uppercase;
+        font-weight: $medium;
+        font-size : 1em; 
+        width : 50%;
+        min-width : 90px;
+        margin : auto; 
+        border-color :#bbe41d;
+
+    }
+
+    &-aide {
+        @extend .button ; 
+        text-transform: uppercase;
+        font-weight: $medium;
+        font-size : 1em; 
+        width : 50%;
+        min-width : 90px;
+        margin : auto; 
+        border-color : #5ac3ff;
+
+    }
+
+    &-retour {
+        padding-top:20%;
+        text-decoration: underline;
+        display : block;
+
+    }
+
+}

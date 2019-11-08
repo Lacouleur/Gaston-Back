@@ -1,0 +1,193 @@
+//CALCUL CSS
+$screenHeigthSize: 100vh;
+//TAILLE NAVBAR ! IMPORTANT
+$navBarHeight: 3rem;
+
+//TYPOGRAPHY
+// all typos can be italic, just add "font-style: italic;" in your CSS sheet.
+$typo-size: 16px;
+$typo-size-Small: 13px;
+$typo-size-extra-small: 10px;
+$typo: 'Montserrat', sans-serif;
+$light: 300;
+$regular: 400;
+$medium: 500;
+$semi-bold: 600;
+$bold: 700;
+
+//TEXT COLORS
+$black-text-color: #262020;
+$dark-grey-text-color: #707070;
+$medium-grey-text-color: #707070;
+$grey-text-color: #8d8b8b;
+$light-grey-text-color: #c2c2c2;
+$title: #041f31;
+
+//BACKGROUND COLORS
+$white-backgroud-color: #fffbf8;
+$grey-background-color: #e0e0e0;
+//MARGES
+$gutter: 1em;
+$small-gutter: $gutter / 2;
+$boxMargin: 0.3em;
+//INTERFACE COLORS
+$toolbar-color: #041f31;
+$error-color: #ff401b;
+$add-button-color: #529af3;
+$got-it-button-color: green;
+//CATEGORY COLORS
+$cat-don-color: #ffdb26;
+$cat-event-color: #7de41d;
+$cat-help-color: #5ac3ff;
+$cat-treasure-color: #ff4d4d;
+//BORDERS
+$border-thin: 0.5px;
+$border-medium: 1px;
+$border-regular: 2px;
+$border-thick: 3px;
+
+//NO SCROLL BAR BUT CAN SCROLL
+
+body {
+  overflow-y: scroll;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+}
+body::-webkit-scrollbar {
+  /* WebKit */
+  width: 0;
+  height: 0;
+}
+
+a {
+  text-decoration: none!important;
+  :hover {
+    cursor: pointer;
+  }
+}
+
+
+.logo {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 40%;
+}
+//CARDS
+.tresor-cards {
+  height: auto;
+  width: 100%;
+  background-color: $white-backgroud-color;
+  border: 1px solid lighten($grey-text-color, 30%);
+  margin-bottom: $boxMargin;
+}
+
+//FIELDS
+.field {
+  border: $border-regular solid $add-button-color;
+  border-radius: 10px;
+  padding: 0.3em 0.5em 0.3em 0.5em;
+  background-color: $white-backgroud-color;
+  font-size: 1em;
+  display: block;
+  margin-top: $boxMargin;
+  margin-bottom: $boxMargin;
+  height : 1.4em;
+  &:hover {
+    cursor : text;
+    opacity: 0.8;
+  }
+}
+
+.searchField {
+  margin-top : 1em;
+  margin : auto;
+  width : 100%;
+  text-align: center;
+  height: 2.5em;
+  margin-bottom: 3%;
+      @extend .field ;
+}
+
+//BOUTONS
+
+.button {
+  border: $border-thick solid $add-button-color;
+  border-radius: 50px;
+  padding: 0.3em 1em 0.3em 1em;
+  background-color: $white-backgroud-color;
+  font-size: 1em;
+  display: block;
+  margin-top: $boxMargin;
+  margin-bottom: $boxMargin;
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.button--don {
+  @extend .button;
+  border-color: $cat-don-color;
+}
+.button--event {
+  @extend .button;
+  border-color: $cat-event-color;
+}
+.button--help {
+  @extend .button;
+  border-color: $cat-help-color;
+}
+.button--treasure {
+  @extend .button;
+  border-color: $cat-treasure-color;
+}
+.button--vanish {
+  @extend .button;
+  font-size: 0.8em!important;
+  border-color: $error-color;
+  margin-top: $small-gutter * 2;
+}
+.button--got-it {
+  @extend .button;
+  font-size: 0.8em!important;
+  border-color: $got-it-button-color;
+  margin-top: $small-gutter * 2;
+}
+
+.button--add {
+  @extend .button;
+  border-color: $add-button-color;
+}
+
+.button--connexion {
+  @extend .button;
+  border-color: $cat-help-color;
+}
+
+.button--inscription {
+  @extend .button;
+  border-color: $cat-event-color;
+}
+.button--forgot {
+  @extend .button;
+  border-color: $cat-treasure-color;
+}
+
+.button-category {
+  font-size: $typo-size-extra-small;
+  border: none;
+  background: #a7a7a7;
+  border-radius: 10px;
+  font-family: Arial;
+  color: #ffffff;
+  padding: 3px 4px 3px 4px;
+  text-decoration: none;
+  margin: 0 $small-gutter / 2;
+  &:hover {
+    text-decoration: none;
+    margin: 0 $small-gutter / 2;
+    &:hover {
+      text-decoration: none;
+    }
+  }
+}
